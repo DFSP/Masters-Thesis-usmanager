@@ -22,6 +22,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.remote.ssh.SshCommandResult
 import pt.unl.fct.miei.usmanagement.manager.services.remote.ssh.SshService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
+import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
 import java.util.Arrays;
@@ -34,13 +35,15 @@ public class CloudHostsController {
 	private final CloudHostsService cloudHostsService;
 	private final SshService sshService;
 	private final SyncService syncService;
+	private final WorkerManagersService workerManagersService;
 	private final ManagerServicesConfiguration managerServicesConfiguration;
 
 	public CloudHostsController(CloudHostsService cloudHostsService, SshService sshService, SyncService syncService,
-								ManagerServicesConfiguration managerServicesConfiguration) {
+								WorkerManagersService workerManagersService, ManagerServicesConfiguration managerServicesConfiguration) {
 		this.cloudHostsService = cloudHostsService;
 		this.sshService = sshService;
 		this.syncService = syncService;
+		this.workerManagersService = workerManagersService;
 		this.managerServicesConfiguration = managerServicesConfiguration;
 	}
 
@@ -49,7 +52,9 @@ public class CloudHostsController {
 		if (managerServicesConfiguration.getMode() == Mode.LOCAL) {
 			throw new BadRequestException("cloud instances are not supported when using local execution mode");
 		}
-		return cloudHostsService.launchInstance(addCloudInstance.getCoordinates());
+		return addCloudInstance.isWorkerManager()
+			? workerManagersService.launchInstance(addCloudInstance.getCoordinates())
+			: cloudHostsService.launchInstance(addCloudInstance.getCoordinates());
 	}
 
 	@GetMapping

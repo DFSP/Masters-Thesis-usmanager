@@ -257,7 +257,7 @@ class Node extends BaseComponent<Props, State> {
         super.toast(`Não foi possível mudar o cargo do nó ${this.mounted ? `<b>${node.id}</b>` : `<a href='/nós/${node.id}'><b>${node.id}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (node: INode): void => {
-        super.toast(`<span class='green-text'>O nó<b>${node.id}</b> ${node.state === 'down' ? 'foi removido com sucesso do swarm' : 'saiu do swarm com sucesso.'}</span>`);
+        super.toast(`<span class='green-text'>O nó <b>${node.id}</b> ${node.state === 'down' ? 'foi removido com sucesso do swarm' : 'saiu do swarm com sucesso.'}</span>`);
         if (this.mounted) {
             this.props.history.push(`/nós`);
         }
@@ -307,7 +307,6 @@ class Node extends BaseComponent<Props, State> {
             return;
         }
         const manager = this.getManagerHost(node);
-        console.log(manager)
         const url = `${manager ? `${manager}/api/` : ''}nodes/${node.id}/join`;
         this.setState({loading: {method: 'post', url: url}});
         postData(url, {},
@@ -348,7 +347,7 @@ class Node extends BaseComponent<Props, State> {
     private onLeaveSuccess = (nodes: INode[]) => {
         let node = nodes[0];
         node = addCoordinates(node);
-        super.toast(`<span class='green-text'>O nó<b>${node.id}</b> saiu com sucesso do swarm</span>`);
+        super.toast(`<span class='green-text'>O nó <b>${node.id}</b> saiu com sucesso do swarm</span>`);
         const previousNode = this.getNode();
         if (previousNode?.id) {
             this.props.updateNode(previousNode as INode, node)
@@ -550,7 +549,7 @@ class Node extends BaseComponent<Props, State> {
     }
 
     private managerLink = (managerId: string) => {
-        if (!!managerId && managerId !== 'manager-master') {
+        if (!!managerId && managerId !== 'master-manager') {
             return `/gestores locais/${managerId}`
         }
         return null;
@@ -598,8 +597,8 @@ class Node extends BaseComponent<Props, State> {
                               || (node as INode).labels?.['masterManager'] === 'true' || (node as INode).state !== 'down'
                                   ? undefined
                                   : {
-                                      textButton: 'Remover do swarm',
-                                      confirmMessage: `remover o nó ${(node as INode).id} do swarm`,
+                                      textButton: manager === undefined ? 'Apagar' : 'Remover do swarm',
+                                      confirmMessage: manager === undefined ? `apagar o nó ${(node as INode).id}` : `remover o nó ${(node as INode).id} do swarm`,
                                       url: `${manager ? `${manager}/api/` : ''}nodes/${(node as INode).id}`,
                                       successCallback: this.onDeleteSuccess,
                                       failureCallback: this.onDeleteFailure

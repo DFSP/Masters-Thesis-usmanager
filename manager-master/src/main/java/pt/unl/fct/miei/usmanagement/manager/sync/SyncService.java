@@ -309,7 +309,7 @@ public class SyncService {
 				continue;
 			}
 			String managerId = node.getManagerId();
-			if ((managerId == null || managerId.equalsIgnoreCase("manager-master")) && !swarmNodesIds.containsKey(nodeId)) {
+			if ((managerId == null || managerId.equalsIgnoreCase(ServiceConstants.Name.MASTER_MANAGER)) && !swarmNodesIds.containsKey(nodeId)) {
 				nodesService.deleteNode(nodeId);
 				nodesIterator.remove();
 				log.info("Removed invalid node {}", nodeId);

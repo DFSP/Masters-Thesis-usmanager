@@ -100,7 +100,7 @@ public class NodesService {
 	}
 
 	public pt.unl.fct.miei.usmanagement.manager.nodes.Node getNode(String id) {
-		return nodes.findNodeById(id).orElseThrow(() ->
+		return nodes.findById(id).orElseThrow(() ->
 			new EntityNotFoundException(Node.class, "id", id));
 	}
 
@@ -185,12 +185,19 @@ public class NodesService {
 	}
 
 	public void removeNode(String nodeId) {
-		dockerSwarmService.removeNode(nodeId);
-		deleteNode(nodeId);
+		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = getNode(nodeId);
+		deleteNode(node);
+		if (!node.getState().equalsIgnoreCase("down")) {
+			dockerSwarmService.removeNode(nodeId);
+		}
 	}
 
 	public void deleteNode(String nodeId) {
 		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = getNode(nodeId);
+		deleteNode(node);
+	}
+
+	public void deleteNode(pt.unl.fct.miei.usmanagement.manager.nodes.Node node) {
 		nodes.delete(node);
 		kafkaService.sendDeleteNode(node);
 	}

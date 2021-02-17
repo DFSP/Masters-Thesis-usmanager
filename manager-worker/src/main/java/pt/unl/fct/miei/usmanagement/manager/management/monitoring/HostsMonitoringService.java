@@ -26,7 +26,6 @@ package pt.unl.fct.miei.usmanagement.manager.management.monitoring;
 
 import com.spotify.docker.client.messages.swarm.Node;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
@@ -36,6 +35,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.location.LocationRequestsService;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.HostsEventsService;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.HostMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.simulated.HostSimulatedMetricsService;
@@ -60,7 +60,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -85,6 +84,7 @@ public class HostsMonitoringService {
 	private final HostSimulatedMetricsService hostSimulatedMetricsService;
 	private final NodesService nodesService;
 	private final KafkaService kafkaService;
+	private final LocationRequestsService locationRequestsService;
 
 	private final long monitorPeriod;
 	private final int resolveOverworkedHostOnEventsCount;
@@ -100,8 +100,9 @@ public class HostsMonitoringService {
 								  HostsService hostsService, HostMetricsService hostMetricsService,
 								  ServicesService servicesService, HostsEventsService hostsEventsService,
 								  DecisionsService decisionsService, HostSimulatedMetricsService hostSimulatedMetricsService,
-								  NodesService nodesService, KafkaService kafkaService, HostProperties hostProperties,
-								  WorkerManagerProperties workerManagerProperties, MonitoringProperties monitoringProperties) {
+								  NodesService nodesService, KafkaService kafkaService, LocationRequestsService locationRequestsService,
+								  HostProperties hostProperties, WorkerManagerProperties workerManagerProperties,
+								  MonitoringProperties monitoringProperties) {
 		this.hostsMonitoring = hostsMonitoring;
 		this.hostMonitoringLogs = hostMonitoringLogs;
 		this.dockerSwarmService = dockerSwarmService;
@@ -115,6 +116,7 @@ public class HostsMonitoringService {
 		this.hostSimulatedMetricsService = hostSimulatedMetricsService;
 		this.nodesService = nodesService;
 		this.kafkaService = kafkaService;
+		this.locationRequestsService = locationRequestsService;
 		this.monitorPeriod = monitoringProperties.getHosts().getPeriod();
 		this.resolveOverworkedHostOnEventsCount = monitoringProperties.getHosts().getOverworkEventCount();
 		this.resolveUnderworkedHostOnEventsCount = monitoringProperties.getHosts().getUnderworkEventCount();
@@ -223,11 +225,11 @@ public class HostsMonitoringService {
 	}
 
 	public HostDecisionResult getHostDecisions(Node node) {
-
 		HostAddress hostAddress = new HostAddress(node.status().addr(), node.spec().labels().get(NodeConstants.Label.PRIVATE_IP_ADDRESS));
 
 		// Metrics from prometheus (node_exporter)
-		Map<String, Optional<Double>> stats = CompletableFuture.supplyAsync(() -> hostMetricsService.getHostStats(hostAddress)).join();
+		Map<String, Optional<Double>> stats = hostMetricsService.getHostStats(hostAddress);
+		log.info("Got prometheus metrics from host: {}", stats);
 
 		Map<String, Double> validStats = stats.entrySet().stream()
 				.filter(stat -> stat.getValue().isPresent())
@@ -240,6 +242,8 @@ public class HostsMonitoringService {
 		validStats.putAll(hostSimulatedFields);
 
 		validStats.forEach((stat, value) -> saveHostMonitoring(hostAddress, stat, value));
+
+		log.info("Metrics for host {} after removing invalid values and applying simulated metrics", stats);
 
 		return runRules(node, validStats);
 	}

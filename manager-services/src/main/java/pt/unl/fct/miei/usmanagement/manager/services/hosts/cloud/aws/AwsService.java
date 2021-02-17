@@ -63,6 +63,7 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
+import pt.unl.fct.miei.usmanagement.manager.loadbalancers.LoadBalancer;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.configurations.ConfigurationsService;
 import pt.unl.fct.miei.usmanagement.manager.services.regions.RegionsService;
@@ -74,6 +75,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -139,23 +141,21 @@ public class AwsService {
 		return amazonEC2;
 	}
 
-	public List<Instance> getInstancesSync(AwsRegion region) {
-		List<Instance> instances = new ArrayList<>();
-		DescribeInstancesRequest request = new DescribeInstancesRequest();
-		DescribeInstancesResult result;
-		try {
-			AmazonEC2 client = getEC2Client(region);
-			do {
-				result = client.describeInstances(request);
-				result.getReservations().stream().map(Reservation::getInstances).flatMap(List::stream)
-						.filter(this::isUsManagerInstance).forEach(instances::add);
-				request.setNextToken(result.getNextToken());
-			} while (result.getNextToken() != null);
+
+	private CompletableFuture<Void> retryGetInstances(Throwable first, int retry, AwsRegion awsRegion,
+													  List<Instance> instances) {
+		if (retry >= 3) {
+			return CompletableFuture.failedFuture(first);
 		}
-		catch (SdkClientException e) {
-			log.error("Unable to get instances from region {}: {}", region.getName(), e.getMessage());
-		}
-		return instances;
+		return CompletableFuture
+			.supplyAsync(() -> this.getInstances(awsRegion))
+			.thenAccept(instances::addAll)
+			.thenApply(CompletableFuture::completedFuture)
+			.exceptionally(t -> {
+				first.addSuppressed(t);
+				return retryGetInstances(first, retry + 1, awsRegion, instances);
+			})
+			.thenCompose(Function.identity());
 	}
 
 	public List<Instance> getInstances() {
@@ -164,10 +164,13 @@ public class AwsService {
 		List<AwsRegion> regions = AwsRegion.getAwsRegions();
 		CompletableFuture<?>[] requests = new CompletableFuture[regions.size()];
 		int count = 0;
-		for (AwsRegion region : regions) {
+		for (AwsRegion awsRegion : regions) {
 			CompletableFuture<?> future = CompletableFuture
-					.supplyAsync(() -> this.getInstances(region)).exceptionally(ex -> Collections.emptyList())
-					.thenAccept(instances::addAll);
+				.supplyAsync(() -> this.getInstances(awsRegion))
+				.thenAccept(instances::addAll)
+				.thenApply(CompletableFuture::completedFuture)
+				.exceptionally(t -> retryGetInstances(t, 0, awsRegion, instances))
+				.thenCompose(Function.identity());
 			requests[count++] = future;
 		}
 
@@ -290,7 +293,6 @@ public class AwsService {
 		amazonEC2.stopInstances(request);
 	}
 
-	@Async
 	public void terminateInstance(String instanceId, AwsRegion region, boolean wait) {
 		log.info("Terminating instance {}", instanceId);
 		setInstanceState(instanceId, AwsInstanceState.TERMINATED, region, wait);

@@ -143,7 +143,6 @@
 			<version>1.4.1.Final</version>
 			<scope>provided</scope>
 		</dependency>
-
 	</dependencies>
 
 	<dependencyManagement>

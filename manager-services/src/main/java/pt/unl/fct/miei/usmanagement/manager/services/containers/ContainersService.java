@@ -416,11 +416,13 @@ public class ContainersService {
 	public void stopContainer(String id) {
 		Container container = getContainer(id);
 		deleteContainer(id);
-		try {
-			dockerContainersService.stopContainer(container);
-		}
-		catch (ManagerException e) {
-			log.error("Failed to stop container {}: {}", id, e.getMessage());
+		if (!container.getState().equalsIgnoreCase("down")) {
+			try {
+				dockerContainersService.stopContainer(container);
+			}
+			catch (ManagerException e) {
+				log.error("Failed to stop container {}: {}", id, e.getMessage());
+			}
 		}
 	}
 

@@ -32,7 +32,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
-
+	"io/ioutil"
 	"github.com/usmanager/manager/nginx-load-balancer-api/data"
 )
 
@@ -135,6 +135,11 @@ func generateNginxConfigFile() {
 		log.Fatal("Execute: ", err)
 		return
 	}
+
+	bytes, _ := ioutil.ReadFile(fileAbsPath)
+	log.Println("Nginx config:")
+	log.Print(string(bytes))
+
 	_ = f.Close()
 	err = files.Copy(fileAbsPath, copyAbsPath)
 	if err != nil {

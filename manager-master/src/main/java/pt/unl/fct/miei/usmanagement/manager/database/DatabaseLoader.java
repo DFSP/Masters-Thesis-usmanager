@@ -725,7 +725,7 @@ public class DatabaseLoader {
     List<EdgeHost> loadEdgeHosts(EdgeHostsService edgeHostsService) {
         List<EdgeHost> egeHosts = new ArrayList<>(1);
 
-        EdgeHost danielHost;
+        /*EdgeHost danielHost;
         try {
             danielHost = edgeHostsService.getEdgeHostByDns("danielfct.ddns.net");
         } catch (EntityNotFoundException ignored) {
@@ -741,18 +741,18 @@ public class DatabaseLoader {
                     .local(true)
                     .build());
         }
-        egeHosts.add(danielHost);
+        egeHosts.add(danielHost);*/
 
         EdgeHost danielHost2;
         try {
-            danielHost2 = edgeHostsService.getEdgeHostByAddress(new HostAddress("2.82.208.89", "192.168.1.93"));
+            danielHost2 = edgeHostsService.getEdgeHostByAddress(new HostAddress("2.82.208.89", "192.168.1.94"));
         } catch (EntityNotFoundException ignored) {
             Coordinates coordinates = new Coordinates("Portugal", 39.575097, -8.909794);
             RegionEnum region = RegionEnum.getClosestRegion(coordinates);
             danielHost2 = edgeHostsService.addEdgeHost(EdgeHost.builder()
                     .username("daniel")
                     .publicIpAddress("2.82.208.89")
-                    .privateIpAddress("192.168.1.93")
+                    .privateIpAddress("192.168.1.94")
                     .region(region)
                     .coordinates(coordinates)
 					.local(true)

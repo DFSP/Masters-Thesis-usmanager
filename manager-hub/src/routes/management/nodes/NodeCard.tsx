@@ -35,7 +35,6 @@ import ActionContextMenuItem from "../../../components/contextmenu/ActionContext
 import {IReply, postData, putData} from "../../../utils/api";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
-import {IWorkerManager} from "../workerManagers/WorkerManager";
 
 interface State {
     loading: boolean;
@@ -77,7 +76,7 @@ class NodeCard extends BaseComponent<Props, State> {
         this.props.node || this.state.node;
 
     private onDeleteSuccess = (node: INode): void => {
-        super.toast(`<span class='green-text'>O nó<b>${node.id}</b> ${node.state === 'down' ? 'foi removido com sucesso do swarm' : 'saiu do swarm'}</span>`);
+        super.toast(`<span class='green-text'>O nó <b>${node.id}</b> ${node.state === 'down' ? 'foi removido com sucesso do swarm' : 'saiu do swarm'}</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -105,7 +104,7 @@ class NodeCard extends BaseComponent<Props, State> {
                     option='Sair do swarm'
                     state={node}
                     onClick={this.leaveSwarm}/>);
-            } else {
+            } else if (this.props.manager !== undefined) {
                 menus.push(<ActionContextMenuItem
                     className='green-text'
                     option='Re-entrar no swarm'
@@ -139,7 +138,7 @@ class NodeCard extends BaseComponent<Props, State> {
 
     private onLeaveSuccess = (nodes: INode[]) => {
         const node = nodes[0];
-        super.toast(`<span class='green-text'>O nó<b>${node.id}</b> saiu do swarm</span>`);
+        super.toast(`<span class='green-text'>O nó <b>${node.id}</b> saiu do swarm</span>`);
         const previousNode = this.getNode();
         if (previousNode?.id) {
             this.props.updateNode(previousNode as INode, node)
@@ -206,9 +205,9 @@ class NodeCard extends BaseComponent<Props, State> {
                          delete={(node as INode).labels?.['masterManager'] === 'true' || (node as INode).state !== 'down'
                              ? undefined
                              : {
-                                 textButton: 'Remover do swarm',
+                                 textButton: this.props.manager === undefined ? 'Apagar' : 'Remover do swarm',
                                  url: `${manager ? `${manager}/api/` : ''}nodes/${(node as INode).id}`,
-                                 confirmMessage: `remover o nó ${node?.id} do swarm`,
+                                 confirmMessage: this.props.manager === undefined ? `Apagar o nó ${node?.id}` : `remover o nó ${node?.id} do swarm`,
                                  successCallback: this.onDeleteSuccess,
                                  failureCallback: this.onDeleteFailure
                              }}>
@@ -226,7 +225,7 @@ class NodeCard extends BaseComponent<Props, State> {
                       label={'Availability'}
                       value={node.availability}/>
             <CardItem key={'role'}
-                      label={'Role'}
+                      label={'Swarm role'}
                       value={node.role}/>
         </CardNode>
     }

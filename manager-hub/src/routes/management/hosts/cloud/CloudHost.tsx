@@ -95,10 +95,12 @@ export interface IPlacement {
 }
 
 interface INewCloudHost {
+    workerManager?: boolean,
     coordinates?: ICoordinates,
 }
 
 const buildNewCloudHost = (): INewCloudHost => ({
+    workerManager: false,
     coordinates: undefined,
 });
 
@@ -468,20 +470,27 @@ class CloudHost extends BaseComponent<Props, State> {
                               ? undefined
                               : `https://${(cloudHost as ICloudHost).awsRegion?.zone}.console.aws.amazon.com/ec2/v2/home?region=${(cloudHost as ICloudHost).awsRegion?.zone}#InstanceDetails:instanceId=${(cloudHost as ICloudHost).instanceId}`}>
                         {isNewCloudHost ?
-                            <Field key='coordinates' id='coordinates' type='map' label='select position'
-                                   map={{
-                                       editable: this.isNew(),
-                                       singleMarker: true,
-                                       zoomable: true,
-                                       labeled: true,
-                                       loading: isLoading,
-                                       markers: this.props.cloudRegions.filter(region => region.available).map(region => ({
-                                           title: region.zone + " | " + region.name,
-                                           latitude: region.coordinates.latitude,
-                                           longitude: region.coordinates.longitude,
-                                           color: '#00FF00'
-                                       }))
-                                   }}/>
+                            <>
+                                <Field key='workerManager'
+                                       id='workerManager'
+                                       type='checkbox'
+                                       value={false}
+                                       checkbox={{label: 'Associar ao Gestor local'}}/>
+                                <Field key='coordinates' id='coordinates' type='map' label='select position'
+                                       map={{
+                                           editable: this.isNew(),
+                                           singleMarker: true,
+                                           zoomable: true,
+                                           labeled: true,
+                                           loading: isLoading,
+                                           markers: this.props.cloudRegions.filter(region => region.available).map(region => ({
+                                               title: region.zone + " | " + region.name,
+                                               latitude: region.coordinates.latitude,
+                                               longitude: region.coordinates.longitude,
+                                               color: '#00FF00'
+                                           }))
+                                       }}/>
+                            </>
                             : formCloudHost && Object.keys(formCloudHost).map((key, index) =>
                             key === 'state'
                                 ? <Field<IState> key={index}

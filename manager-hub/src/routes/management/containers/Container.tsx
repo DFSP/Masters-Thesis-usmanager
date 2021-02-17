@@ -122,6 +122,7 @@ interface INewContainerHost {
 }
 
 interface INewContainerLocation {
+    workerManager?: boolean,
     service?: string,
     externalPort?: number,
     internalPort?: number,
@@ -136,6 +137,7 @@ const buildNewContainerHost = (): INewContainerHost => ({
 });
 
 const buildNewContainerLocation = (): INewContainerLocation => ({
+    workerManager: false,
     service: undefined,
     externalPort: undefined,
     internalPort: undefined,
@@ -566,7 +568,7 @@ class Container extends BaseComponent<Props, State> {
     }
 
     private managerLink = (managerId: string) => {
-        if (!!managerId && managerId !== 'manager-master') {
+        if (!!managerId && managerId !== 'master-manager') {
             return `/gestores locais/${managerId}`
         }
         return null;
@@ -635,6 +637,11 @@ class Container extends BaseComponent<Props, State> {
                 </>
                 :
                 <>
+                    <Field key='workerManager'
+                           id='workerManager'
+                           type='checkbox'
+                           value={true}
+                           checkbox={{label: 'Associar ao Gestor local'}}/>
                     <Field key={'service'}
                            id={'service'}
                            label={'service'}

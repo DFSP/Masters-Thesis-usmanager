@@ -35,6 +35,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -69,6 +70,7 @@ public class ElasticIpsService {
 		return elasticIps.findById(id).orElseThrow(() ->
 			new EntityNotFoundException(ElasticIp.class, "id", id.toString()));
 	}
+
 	public boolean hasElasticIpByPublicIp(String publicIpAddress) {
 		return elasticIps.hasElasticIpByPublicIp(publicIpAddress);
 	}
@@ -139,7 +141,7 @@ public class ElasticIpsService {
 					List<Address> addresses = currentAddresses.get(region);
 					if (addresses == null || addresses.isEmpty() || addresses.get(0).getAssociationId() != null) {
 						CompletableFuture<?> future = CompletableFuture
-								.supplyAsync(() -> allocateElasticIpAddress(region)).exceptionally(ex -> null);
+							.supplyAsync(() -> allocateElasticIpAddress(region)).exceptionally(ex -> null);
 						requests.put(region, future);
 					}
 				}
@@ -185,29 +187,41 @@ public class ElasticIpsService {
 		return cloudHost;
 	}
 
-	private Map<RegionEnum, List<Address>> getElasticIpAddresses() {
+	private CompletableFuture<Void> retryGetElasticIpAddresses(Throwable first, int retry,
+															   RegionEnum region, AwsRegion awsRegion,
+															   Map<RegionEnum, List<Address>> elasticIpAddresses) {
+		if (retry >= 3) {
+			return CompletableFuture.failedFuture(first);
+		}
+		return CompletableFuture
+			.supplyAsync(() -> awsService.getElasticIpAddresses(awsRegion))
+			.thenAccept(elasticIps -> elasticIpAddresses.put(region, elasticIps))
+			.thenApply(CompletableFuture::completedFuture)
+			.exceptionally(t -> {
+				first.addSuppressed(t);
+				return retryGetElasticIpAddresses(first, retry + 1, region, awsRegion, elasticIpAddresses);
+			})
+			.thenCompose(Function.identity());
+	}
+
+	public Map<RegionEnum, List<Address>> getElasticIpAddresses() {
 		Map<RegionEnum, List<Address>> elasticIpAddresses = new HashMap<>(RegionEnum.values().length);
 
-		Map<RegionEnum, CompletableFuture<?>> requests = new HashMap<>();
-		for (RegionEnum region : RegionEnum.values()) {
+		RegionEnum[] regions = RegionEnum.values();
+		CompletableFuture<?>[] requests = new CompletableFuture[regions.length];
+		int count = 0;
+		for (RegionEnum region : regions) {
 			AwsRegion awsRegion = AwsRegion.getRegionsToAwsRegions().get(region);
-			final int retries = 3;
-			for (int i = 0; i < retries; i++) {
-				try {
-					CompletableFuture<?> future = CompletableFuture
-							.supplyAsync(() -> awsService.getElasticIpAddresses(awsRegion))
-							.thenAccept(elasticIps -> elasticIpAddresses.put(region, elasticIps));
-					requests.put(region, future);
-					break;
-				}
-				catch (SdkClientException e) {
-					log.error("Failed to get elastic ips from region {}. Retrying {}/{}", awsRegion.getZone(), i + 1, retries);
-					Timing.sleep(i * 2, TimeUnit.SECONDS);
-				}
-			}
+			CompletableFuture<?> future = CompletableFuture
+				.supplyAsync(() -> awsService.getElasticIpAddresses(awsRegion))
+				.thenAccept(elasticIps -> elasticIpAddresses.put(region, elasticIps))
+				.thenApply(CompletableFuture::completedFuture)
+				.exceptionally(t -> retryGetElasticIpAddresses(t, 0, region, awsRegion, elasticIpAddresses))
+				.thenCompose(Function.identity());
+			requests[count++] = future;
 		}
 
-		CompletableFuture.allOf(requests.values().toArray(new CompletableFuture[0])).join();
+		CompletableFuture.allOf(requests).join();
 
 		return elasticIpAddresses;
 	}

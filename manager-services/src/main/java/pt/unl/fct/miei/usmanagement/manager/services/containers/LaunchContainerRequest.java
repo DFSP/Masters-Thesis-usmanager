@@ -33,6 +33,7 @@ import java.util.List;
 @Data
 public class LaunchContainerRequest {
 
+	private boolean workerManager;
 	private final String service;
 	private final int internalPort;
 	private final int externalPort;

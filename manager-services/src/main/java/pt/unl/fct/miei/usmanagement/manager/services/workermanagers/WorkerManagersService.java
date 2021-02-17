@@ -45,6 +45,7 @@ import pt.unl.fct.miei.usmanagement.manager.heartbeats.Heartbeat;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.registrationservers.RegistrationServer;
@@ -55,6 +56,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersServic
 import pt.unl.fct.miei.usmanagement.manager.services.containers.LaunchContainerRequest;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.AddNode;
 import pt.unl.fct.miei.usmanagement.manager.services.heartbeats.HeartbeatService;
+import pt.unl.fct.miei.usmanagement.manager.services.hosts.AddCloudInstance;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
@@ -169,6 +171,23 @@ public class WorkerManagersService {
 		});
 	}
 
+	private HostAddress getHostAddressForWorkerManager(RegionEnum region) {
+		//TODO get most suitable host instead (lowest usage?)
+		/*Predicate<Node> filter = node -> !node.getHostAddress().equals(hostsService.getManagerHostAddress())
+							&& !elasticIpsService.hasElasticIpByPublicIp(node.getHostAddress().getPublicIpAddress());
+						HostAddress hostAddress = hostsService.getCapableHost(expectedMemoryConsumption, region, filter);*/
+		HostAddress hostAddress;
+		List<CloudHost> cloudHosts = cloudHostsService.getCloudHostByTypeAndRegion(InstanceType.T2Medium, region);
+		if (cloudHosts.size() > 0) {
+			hostAddress = cloudHosts.get(0).getAddress();
+		}
+		else {
+			AwsRegion awsRegion = AwsRegion.getRegionsToAwsRegions().get(region);
+			hostAddress = cloudHostsService.launchInstance(awsRegion, InstanceType.T2Medium, false).getAddress();
+		}
+		return hostAddress;
+	}
+
 	public List<WorkerManager> launchWorkerManagers(List<RegionEnum> regions) {
 		log.info("Launching worker managers at regions {}", regions);
 
@@ -182,13 +201,9 @@ public class WorkerManagersService {
 						return regionWorkerManagers.get(0);
 					}
 					else {
-						/*Predicate<Node> filter = node -> !node.getHostAddress().equals(hostsService.getManagerHostAddress())
-							&& !elasticIpsService.hasElasticIpByPublicIp(node.getHostAddress().getPublicIpAddress());
-						HostAddress hostAddress = hostsService.getCapableHost(expectedMemoryConsumption, region, filter);*/
-						AwsRegion awsRegion = AwsRegion.getRegionsToAwsRegions().get(region);
 						HostAddress hostAddress = managerServicesConfiguration.getMode() == Mode.LOCAL
 							? hostsService.getManagerHostAddress()
-							: cloudHostsService.launchInstance(awsRegion, InstanceType.T2Medium, false).getAddress();
+							: getHostAddressForWorkerManager(region);
 						return launchWorkerManager(hostAddress);
 					}
 				}).collect(Collectors.toList())).get();
@@ -251,7 +266,7 @@ public class WorkerManagersService {
 		catch (EntityNotFoundException e) {
 			log.error("Failed to stop container {} associated with worker manager {}", containerId, workerManager.getId());
 		}
-		heartbeatService.deleteHeartbeat(workerManager.getId());
+		//heartbeatService.deleteHeartbeat(workerManager.getId());
 	}
 
 	public void deleteWorkerManagerByContainer(Container container) {
@@ -569,5 +584,24 @@ public class WorkerManagersService {
 		List<Node> nodes = new ArrayList<>();
 		regionNodes.forEach(nodes::addAll);
 		return nodes;
+	}
+
+	public CloudHost launchInstance(Coordinates coordinates) {
+		RegionEnum region = RegionEnum.getClosestRegion(coordinates);
+		WorkerManager workerManager = getRegionWorkerManager(region);
+		return launchInstance(workerManager, coordinates);
+	}
+
+	public CloudHost launchInstance(WorkerManager workerManager, Coordinates coordinates) {
+		String publicIpAddress = workerManager.getPublicIpAddress();
+		int port = workerManager.getPort();
+		String url = String.format("http://%s:%d/api/hosts/cloud", publicIpAddress, port);
+		try {
+			log.info("Sending request {} {} to worker manager {}", url, coordinates, workerManager.getId());
+			return restTemplate.postForObject(url, coordinates, CloudHost.class);
+		}
+		catch (HttpClientErrorException e) {
+			throw new ManagerException(e.getMessage());
+		}
 	}
 }
