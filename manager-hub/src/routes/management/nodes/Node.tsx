@@ -550,7 +550,7 @@ class Node extends BaseComponent<Props, State> {
     }
 
     private managerLink = (managerId: string) => {
-        if (!!managerId && managerId !== 'manager-master') {
+        if (!!managerId && managerId !== 'master-manager') {
             return `/gestores locais/${managerId}`
         }
         return null;
