@@ -45,6 +45,9 @@ public class Main {
 	private static final int PORT = 2375;
 
 	public static void main(String[] args) throws IOException {
+		if (args.length != 2) {
+			System.err.println("Usage: java container-monitor hostname containerId");
+		}
 		final String hostname = args[0];
 		final String containerId = args[1];
 		System.out.println("Monitoring container " + containerId + " on hostname " + hostname + "...");
@@ -88,6 +91,7 @@ public class Main {
 		}
 		FileWriter writer = new FileWriter(outFile.toFile());
 		writer.write("timestamp,ram,cpu-%,rx-bytes,tx-bytes\n");
+		writer.flush();
 		return writer;
 	}
 

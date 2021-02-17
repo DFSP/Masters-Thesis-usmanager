@@ -8,8 +8,6 @@ import java.util.Optional;
 
 public interface Nodes extends JpaRepository<Node, String> {
 
-	Optional<Node> findNodeById(String id);
-
 	List<Node> findByPublicIpAddress(String publicIpAddress);
 
 	List<Node> findByAvailability(NodeAvailability nodeAvailability);

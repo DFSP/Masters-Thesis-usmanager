@@ -43,3 +43,979 @@ INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_strin
 2021-02-16 12:38:50 jdbc[4]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
+2021-02-17 11:48:31 jdbc[3490]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'org.springframework.web.client.HttpServerErrorException$InternalServerError: 500 : [{""apierror"":{""status"":""INTERNAL_SERVER_ERRO... (300)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+2021-02-17 11:48:31 jdbc[3490]: exception
+org.h2.jdbc.JdbcBatchUpdateException: Value too long for column "TRACE_LINE VARCHAR(256)": "'org.springframework.web.client.HttpServerErrorException$InternalServerError: 500 : [{""apierror"":{""status"":""INTERNAL_SERVER_ERRO... (300)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+	at org.h2.jdbc.JdbcPreparedStatement.executeBatch(JdbcPreparedStatement.java:1235)
+	at ch.qos.logback.classic.db.DBAppender.insertThrowable(DBAppender.java:288)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:115)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:43)
+	at ch.qos.logback.core.db.DBAppenderBase.append(DBAppenderBase.java:108)
+	at ch.qos.logback.core.UnsynchronizedAppenderBase.doAppend(UnsynchronizedAppenderBase.java:84)
+	at ch.qos.logback.core.spi.AppenderAttachableImpl.appendLoopOnAppenders(AppenderAttachableImpl.java:51)
+	at ch.qos.logback.classic.Logger.appendLoopOnAppenders(Logger.java:270)
+	at ch.qos.logback.classic.Logger.callAppenders(Logger.java:257)
+	at ch.qos.logback.classic.Logger.buildLoggingEventAndAppend(Logger.java:421)
+	at ch.qos.logback.classic.Logger.filterAndLog_0_Or3Plus(Logger.java:383)
+	at ch.qos.logback.classic.Logger.log(Logger.java:765)
+	at org.slf4j.bridge.SLF4JBridgeHandler.callLocationAwareLogger(SLF4JBridgeHandler.java:221)
+	at org.slf4j.bridge.SLF4JBridgeHandler.publish(SLF4JBridgeHandler.java:303)
+	at java.logging/java.util.logging.Logger.log(Logger.java:979)
+	at java.logging/java.util.logging.Logger.doLog(Logger.java:1006)
+	at java.logging/java.util.logging.Logger.logp(Logger.java:1283)
+	at org.apache.juli.logging.DirectJDKLog.log(DirectJDKLog.java:175)
+	at org.apache.juli.logging.DirectJDKLog.error(DirectJDKLog.java:141)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:244)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:96)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:541)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:139)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:343)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:373)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:65)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:868)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1590)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'org.springframework.web.client.HttpServerErrorException$InternalServerError: 500 : [{""apierror"":{""status"":""INTERNAL_SERVER_ERRO... (300)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:457)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:429)
+	at org.h2.message.DbException.get(DbException.java:205)
+	at org.h2.value.TypeInfo.getValueTooLongException(TypeInfo.java:535)
+	at org.h2.value.TypeInfo.cast(TypeInfo.java:520)
+	at org.h2.table.Column.validateConvertUpdateSequence(Column.java:378)
+	at org.h2.table.Table.validateConvertUpdateSequence(Table.java:845)
+	at org.h2.command.dml.Insert.insertRows(Insert.java:187)
+	at org.h2.command.dml.Insert.update(Insert.java:151)
+	at org.h2.command.CommandContainer.update(CommandContainer.java:198)
+	at org.h2.command.Command.executeUpdate(Command.java:251)
+	at org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:191)
+	at org.h2.jdbc.JdbcPreparedStatement.executeBatch(JdbcPreparedStatement.java:1219)
+	at ch.qos.logback.classic.db.DBAppender.insertThrowable(DBAppender.java:288)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:115)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:43)
+	at ch.qos.logback.core.db.DBAppenderBase.append(DBAppenderBase.java:108)
+	at ch.qos.logback.core.UnsynchronizedAppenderBase.doAppend(UnsynchronizedAppenderBase.java:84)
+	at ch.qos.logback.core.spi.AppenderAttachableImpl.appendLoopOnAppenders(AppenderAttachableImpl.java:51)
+	at ch.qos.logback.classic.Logger.appendLoopOnAppenders(Logger.java:270)
+	at ch.qos.logback.classic.Logger.callAppenders(Logger.java:257)
+	at ch.qos.logback.classic.Logger.buildLoggingEventAndAppend(Logger.java:421)
+	at ch.qos.logback.classic.Logger.filterAndLog_0_Or3Plus(Logger.java:383)
+	at ch.qos.logback.classic.Logger.log(Logger.java:765)
+	at org.slf4j.bridge.SLF4JBridgeHandler.callLocationAwareLogger(SLF4JBridgeHandler.java:221)
+	at org.slf4j.bridge.SLF4JBridgeHandler.publish(SLF4JBridgeHandler.java:303)
+	at java.logging/java.util.logging.Logger.log(Logger.java:979)
+	at java.logging/java.util.logging.Logger.doLog(Logger.java:1006)
+	at java.logging/java.util.logging.Logger.logp(Logger.java:1283)
+	at org.apache.juli.logging.DirectJDKLog.log(DirectJDKLog.java:175)
+	at org.apache.juli.logging.DirectJDKLog.error(DirectJDKLog.java:141)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:244)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:96)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:541)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:139)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:343)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:373)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:65)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:868)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1590)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 11"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+(truncated)
+2021-02-17 12:33:01 jdbc[1339]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'org.springframework.kafka.KafkaException: Seek to current after exception; nested exception is org.springframework.kafka.listen... (941)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+2021-02-17 12:33:01 jdbc[1339]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'Caused by: org.springframework.kafka.listener.ListenerExecutionFailedException: Listener method ''public void pt.unl.fct.miei.u... (857)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+2021-02-17 12:33:01 jdbc[1339]: exception
+org.h2.jdbc.JdbcBatchUpdateException: Value too long for column "TRACE_LINE VARCHAR(256)": "'org.springframework.kafka.KafkaException: Seek to current after exception; nested exception is org.springframework.kafka.listen... (941)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+	at org.h2.jdbc.JdbcPreparedStatement.executeBatch(JdbcPreparedStatement.java:1235)
+	at ch.qos.logback.classic.db.DBAppender.insertThrowable(DBAppender.java:288)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:115)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:43)
+	at ch.qos.logback.core.db.DBAppenderBase.append(DBAppenderBase.java:108)
+	at ch.qos.logback.core.UnsynchronizedAppenderBase.doAppend(UnsynchronizedAppenderBase.java:84)
+	at ch.qos.logback.core.spi.AppenderAttachableImpl.appendLoopOnAppenders(AppenderAttachableImpl.java:51)
+	at ch.qos.logback.classic.Logger.appendLoopOnAppenders(Logger.java:270)
+	at ch.qos.logback.classic.Logger.callAppenders(Logger.java:257)
+	at ch.qos.logback.classic.Logger.buildLoggingEventAndAppend(Logger.java:421)
+	at ch.qos.logback.classic.Logger.filterAndLog_0_Or3Plus(Logger.java:383)
+	at ch.qos.logback.classic.Logger.log(Logger.java:765)
+	at org.apache.commons.logging.LogAdapter$Slf4jLocationAwareLog.error(LogAdapter.java:433)
+	at org.springframework.core.log.LogAccessor.error(LogAccessor.java:149)
+	at org.springframework.kafka.KafkaException.selfLog(KafkaException.java:114)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeBatchListener(KafkaMessageListenerContainer.java:1492)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeBatchListener(KafkaMessageListenerContainer.java:1362)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeListener(KafkaMessageListenerContainer.java:1345)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.pollAndInvoke(KafkaMessageListenerContainer.java:1064)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.run(KafkaMessageListenerContainer.java:972)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:515)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'org.springframework.kafka.KafkaException: Seek to current after exception; nested exception is org.springframework.kafka.listen... (941)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:457)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:429)
+	at org.h2.message.DbException.get(DbException.java:205)
+	at org.h2.value.TypeInfo.getValueTooLongException(TypeInfo.java:535)
+	at org.h2.value.TypeInfo.cast(TypeInfo.java:520)
+	at org.h2.table.Column.validateConvertUpdateSequence(Column.java:378)
+	at org.h2.table.Table.validateConvertUpdateSequence(Table.java:845)
+	at org.h2.command.dml.Insert.insertRows(Insert.java:187)
+	at org.h2.command.dml.Insert.update(Insert.java:151)
+	at org.h2.command.CommandContainer.update(CommandContainer.java:198)
+	at org.h2.command.Command.executeUpdate(Command.java:251)
+	at org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:191)
+	at org.h2.jdbc.JdbcPreparedStatement.executeBatch(JdbcPreparedStatement.java:1219)
+	at ch.qos.logback.classic.db.DBAppender.insertThrowable(DBAppender.java:288)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:115)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:43)
+	at ch.qos.logback.core.db.DBAppenderBase.append(DBAppenderBase.java:108)
+	at ch.qos.logback.core.UnsynchronizedAppenderBase.doAppend(UnsynchronizedAppenderBase.java:84)
+	at ch.qos.logback.core.spi.AppenderAttachableImpl.appendLoopOnAppenders(AppenderAttachableImpl.java:51)
+	at ch.qos.logback.classic.Logger.appendLoopOnAppenders(Logger.java:270)
+	at ch.qos.logback.classic.Logger.callAppenders(Logger.java:257)
+	at ch.qos.logback.classic.Logger.buildLoggingEventAndAppend(Logger.java:421)
+	at ch.qos.logback.classic.Logger.filterAndLog_0_Or3Plus(Logger.java:383)
+	at ch.qos.logback.classic.Logger.log(Logger.java:765)
+	at org.apache.commons.logging.LogAdapter$Slf4jLocationAwareLog.error(LogAdapter.java:433)
+	at org.springframework.core.log.LogAccessor.error(LogAccessor.java:149)
+	at org.springframework.kafka.KafkaException.selfLog(KafkaException.java:114)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeBatchListener(KafkaMessageListenerContainer.java:1492)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeBatchListener(KafkaMessageListenerContainer.java:1362)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeListener(KafkaMessageListenerContainer.java:1345)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.pollAndInvoke(KafkaMessageListenerContainer.java:1064)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.run(KafkaMessageListenerContainer.java:972)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:515)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'Caused by: org.springframework.kafka.listener.ListenerExecutionFailedException: Listener method ''public void pt.unl.fct.miei.u... (857)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+2021-02-17 12:33:20 jdbc[1351]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'org.springframework.kafka.KafkaException: Seek to current after exception; nested exception is org.springframework.kafka.listen... (931)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+2021-02-17 12:33:20 jdbc[1351]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'Caused by: org.springframework.kafka.listener.ListenerExecutionFailedException: Listener method ''public void pt.unl.fct.miei.u... (847)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+2021-02-17 12:33:20 jdbc[1351]: exception
+org.h2.jdbc.JdbcBatchUpdateException: Value too long for column "TRACE_LINE VARCHAR(256)": "'org.springframework.kafka.KafkaException: Seek to current after exception; nested exception is org.springframework.kafka.listen... (931)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+	at org.h2.jdbc.JdbcPreparedStatement.executeBatch(JdbcPreparedStatement.java:1235)
+	at ch.qos.logback.classic.db.DBAppender.insertThrowable(DBAppender.java:288)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:115)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:43)
+	at ch.qos.logback.core.db.DBAppenderBase.append(DBAppenderBase.java:108)
+	at ch.qos.logback.core.UnsynchronizedAppenderBase.doAppend(UnsynchronizedAppenderBase.java:84)
+	at ch.qos.logback.core.spi.AppenderAttachableImpl.appendLoopOnAppenders(AppenderAttachableImpl.java:51)
+	at ch.qos.logback.classic.Logger.appendLoopOnAppenders(Logger.java:270)
+	at ch.qos.logback.classic.Logger.callAppenders(Logger.java:257)
+	at ch.qos.logback.classic.Logger.buildLoggingEventAndAppend(Logger.java:421)
+	at ch.qos.logback.classic.Logger.filterAndLog_0_Or3Plus(Logger.java:383)
+	at ch.qos.logback.classic.Logger.log(Logger.java:765)
+	at org.apache.commons.logging.LogAdapter$Slf4jLocationAwareLog.error(LogAdapter.java:433)
+	at org.springframework.core.log.LogAccessor.error(LogAccessor.java:149)
+	at org.springframework.kafka.KafkaException.selfLog(KafkaException.java:114)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeBatchListener(KafkaMessageListenerContainer.java:1492)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeBatchListener(KafkaMessageListenerContainer.java:1362)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeListener(KafkaMessageListenerContainer.java:1345)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.pollAndInvoke(KafkaMessageListenerContainer.java:1064)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.run(KafkaMessageListenerContainer.java:972)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:515)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'org.springframework.kafka.KafkaException: Seek to current after exception; nested exception is org.springframework.kafka.listen... (931)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:457)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:429)
+	at org.h2.message.DbException.get(DbException.java:205)
+	at org.h2.value.TypeInfo.getValueTooLongException(TypeInfo.java:535)
+	at org.h2.value.TypeInfo.cast(TypeInfo.java:520)
+	at org.h2.table.Column.validateConvertUpdateSequence(Column.java:378)
+	at org.h2.table.Table.validateConvertUpdateSequence(Table.java:845)
+	at org.h2.command.dml.Insert.insertRows(Insert.java:187)
+	at org.h2.command.dml.Insert.update(Insert.java:151)
+	at org.h2.command.CommandContainer.update(CommandContainer.java:198)
+	at org.h2.command.Command.executeUpdate(Command.java:251)
+	at org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:191)
+	at org.h2.jdbc.JdbcPreparedStatement.executeBatch(JdbcPreparedStatement.java:1219)
+	at ch.qos.logback.classic.db.DBAppender.insertThrowable(DBAppender.java:288)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:115)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:43)
+	at ch.qos.logback.core.db.DBAppenderBase.append(DBAppenderBase.java:108)
+	at ch.qos.logback.core.UnsynchronizedAppenderBase.doAppend(UnsynchronizedAppenderBase.java:84)
+	at ch.qos.logback.core.spi.AppenderAttachableImpl.appendLoopOnAppenders(AppenderAttachableImpl.java:51)
+	at ch.qos.logback.classic.Logger.appendLoopOnAppenders(Logger.java:270)
+	at ch.qos.logback.classic.Logger.callAppenders(Logger.java:257)
+	at ch.qos.logback.classic.Logger.buildLoggingEventAndAppend(Logger.java:421)
+	at ch.qos.logback.classic.Logger.filterAndLog_0_Or3Plus(Logger.java:383)
+	at ch.qos.logback.classic.Logger.log(Logger.java:765)
+	at org.apache.commons.logging.LogAdapter$Slf4jLocationAwareLog.error(LogAdapter.java:433)
+	at org.springframework.core.log.LogAccessor.error(LogAccessor.java:149)
+	at org.springframework.kafka.KafkaException.selfLog(KafkaException.java:114)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeBatchListener(KafkaMessageListenerContainer.java:1492)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeBatchListener(KafkaMessageListenerContainer.java:1362)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeListener(KafkaMessageListenerContainer.java:1345)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.pollAndInvoke(KafkaMessageListenerContainer.java:1064)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.run(KafkaMessageListenerContainer.java:972)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:515)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'Caused by: org.springframework.kafka.listener.ListenerExecutionFailedException: Listener method ''public void pt.unl.fct.miei.u... (847)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 65"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+2021-02-17 12:38:57 jdbc[1827]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'org.springframework.web.client.HttpServerErrorException$InternalServerError: 500 : [{""apierror"":{""status"":""INTERNAL_SERVER_ERRO... (300)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+2021-02-17 12:38:57 jdbc[1827]: exception
+org.h2.jdbc.JdbcBatchUpdateException: Value too long for column "TRACE_LINE VARCHAR(256)": "'org.springframework.web.client.HttpServerErrorException$InternalServerError: 500 : [{""apierror"":{""status"":""INTERNAL_SERVER_ERRO... (300)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+	at org.h2.jdbc.JdbcPreparedStatement.executeBatch(JdbcPreparedStatement.java:1235)
+	at ch.qos.logback.classic.db.DBAppender.insertThrowable(DBAppender.java:288)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:115)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:43)
+	at ch.qos.logback.core.db.DBAppenderBase.append(DBAppenderBase.java:108)
+	at ch.qos.logback.core.UnsynchronizedAppenderBase.doAppend(UnsynchronizedAppenderBase.java:84)
+	at ch.qos.logback.core.spi.AppenderAttachableImpl.appendLoopOnAppenders(AppenderAttachableImpl.java:51)
+	at ch.qos.logback.classic.Logger.appendLoopOnAppenders(Logger.java:270)
+	at ch.qos.logback.classic.Logger.callAppenders(Logger.java:257)
+	at ch.qos.logback.classic.Logger.buildLoggingEventAndAppend(Logger.java:421)
+	at ch.qos.logback.classic.Logger.filterAndLog_0_Or3Plus(Logger.java:383)
+	at ch.qos.logback.classic.Logger.log(Logger.java:765)
+	at org.slf4j.bridge.SLF4JBridgeHandler.callLocationAwareLogger(SLF4JBridgeHandler.java:221)
+	at org.slf4j.bridge.SLF4JBridgeHandler.publish(SLF4JBridgeHandler.java:303)
+	at java.logging/java.util.logging.Logger.log(Logger.java:979)
+	at java.logging/java.util.logging.Logger.doLog(Logger.java:1006)
+	at java.logging/java.util.logging.Logger.logp(Logger.java:1283)
+	at org.apache.juli.logging.DirectJDKLog.log(DirectJDKLog.java:175)
+	at org.apache.juli.logging.DirectJDKLog.error(DirectJDKLog.java:141)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:244)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:96)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:541)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:139)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:343)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:373)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:65)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:868)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1590)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'org.springframework.web.client.HttpServerErrorException$InternalServerError: 500 : [{""apierror"":{""status"":""INTERNAL_SERVER_ERRO... (300)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:457)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:429)
+	at org.h2.message.DbException.get(DbException.java:205)
+	at org.h2.value.TypeInfo.getValueTooLongException(TypeInfo.java:535)
+	at org.h2.value.TypeInfo.cast(TypeInfo.java:520)
+	at org.h2.table.Column.validateConvertUpdateSequence(Column.java:378)
+	at org.h2.table.Table.validateConvertUpdateSequence(Table.java:845)
+	at org.h2.command.dml.Insert.insertRows(Insert.java:187)
+	at org.h2.command.dml.Insert.update(Insert.java:151)
+	at org.h2.command.CommandContainer.update(CommandContainer.java:198)
+	at org.h2.command.Command.executeUpdate(Command.java:251)
+	at org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:191)
+	at org.h2.jdbc.JdbcPreparedStatement.executeBatch(JdbcPreparedStatement.java:1219)
+	at ch.qos.logback.classic.db.DBAppender.insertThrowable(DBAppender.java:288)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:115)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:43)
+	at ch.qos.logback.core.db.DBAppenderBase.append(DBAppenderBase.java:108)
+	at ch.qos.logback.core.UnsynchronizedAppenderBase.doAppend(UnsynchronizedAppenderBase.java:84)
+	at ch.qos.logback.core.spi.AppenderAttachableImpl.appendLoopOnAppenders(AppenderAttachableImpl.java:51)
+	at ch.qos.logback.classic.Logger.appendLoopOnAppenders(Logger.java:270)
+	at ch.qos.logback.classic.Logger.callAppenders(Logger.java:257)
+	at ch.qos.logback.classic.Logger.buildLoggingEventAndAppend(Logger.java:421)
+	at ch.qos.logback.classic.Logger.filterAndLog_0_Or3Plus(Logger.java:383)
+	at ch.qos.logback.classic.Logger.log(Logger.java:765)
+	at org.slf4j.bridge.SLF4JBridgeHandler.callLocationAwareLogger(SLF4JBridgeHandler.java:221)
+	at org.slf4j.bridge.SLF4JBridgeHandler.publish(SLF4JBridgeHandler.java:303)
+	at java.logging/java.util.logging.Logger.log(Logger.java:979)
+	at java.logging/java.util.logging.Logger.doLog(Logger.java:1006)
+	at java.logging/java.util.logging.Logger.logp(Logger.java:1283)
+	at org.apache.juli.logging.DirectJDKLog.log(DirectJDKLog.java:175)
+	at org.apache.juli.logging.DirectJDKLog.error(DirectJDKLog.java:141)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:244)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:96)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:541)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:139)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:343)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:373)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:65)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:868)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1590)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1168"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+(truncated)

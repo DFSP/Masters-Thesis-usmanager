@@ -2,7 +2,7 @@ import http from 'k6/http';
 import { check } from "k6";
 
 export let options = {
-    iterations: '50',
+    iterations: '10',
 };
 
 export default function () {
