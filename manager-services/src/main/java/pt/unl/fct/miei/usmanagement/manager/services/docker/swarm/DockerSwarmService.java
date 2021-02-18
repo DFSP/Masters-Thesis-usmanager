@@ -135,10 +135,11 @@ public class DockerSwarmService {
 		String nodeId = nodeIdRegexExpression.group(0);
 		configurationsService.addConfiguration(nodeId);
 		try {
-			boolean masterManager = Objects.equals(environment.getProperty(ContainerConstants.Environment.Manager.ID),
-				ServiceConstants.Name.MASTER_MANAGER);
-			setNodeLabels(nodeId, listenAddress, username, hostAddress.getCoordinates(), hostAddress.getRegion(),
-				hostAddress.getPlace(), Collections.singletonMap(NodeConstants.Label.MASTER_MANAGER, String.valueOf(masterManager)));
+			Map<String, String> customLabels = new HashMap<>(1);
+			if (Objects.equals(environment.getProperty(ContainerConstants.Environment.Manager.ID), ServiceConstants.Name.MASTER_MANAGER)) {
+				customLabels.put(NodeConstants.Label.MASTER_MANAGER, String.valueOf(true));
+			}
+			setNodeLabels(nodeId, listenAddress, username, hostAddress.getCoordinates(), hostAddress.getRegion(), hostAddress.getPlace(), customLabels);
 			createNetworkOverlay(hostAddress);
 			Node swarmNode = getNode(nodeId);
 			return nodesService.addNode(swarmNode);
