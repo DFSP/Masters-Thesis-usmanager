@@ -322,7 +322,7 @@ public class HostsService {
 		if (managerServicesConfiguration.getMode() == Mode.LOCAL) {
 			return getManagerHostAddress();
 		}
-		log.info("Looking for node on region {} with <90% memory available and <90% cpu usage to launch service with {} expected ram usage",
+		log.info("Looking for node on region {} with enough resources to launch service with {} expected ram usage",
 			region.getRegion(), availableMemory);
 		List<HostAddress> nodes = nodesService.getReadyNodes().stream()
 			.filter(node -> node.getRegion() == region && hostMetricsService.hostHasEnoughResources(node.getHostAddress(), availableMemory)

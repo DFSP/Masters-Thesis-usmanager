@@ -69,39 +69,40 @@ public class HostMetricsService {
 				PrometheusQueryEnum.AVAILABLE_MEMORY,
 				PrometheusQueryEnum.CPU_USAGE_PERCENTAGE);
 
-		List<Optional<Double>> metrics = new ArrayList<>(prometheusQueries.size());
+		Map<PrometheusQueryEnum, Optional<Double>> metrics = new HashMap<>(prometheusQueries.size());
 
-		CompletableFuture<?>[] requests = new CompletableFuture[prometheusQueries.size()];
-		int count = 0;
+		List<CompletableFuture<?>> requests = new LinkedList<>();
 		for (PrometheusQueryEnum prometheusQuery : prometheusQueries) {
 			if (port.isEmpty()) {
-				metrics.add(Optional.empty());
+				metrics.put(prometheusQuery, Optional.empty());
 			}
 			else {
 				CompletableFuture<?> future = CompletableFuture
 						.supplyAsync(() -> prometheusService.getStat(hostAddress, port.get(), prometheusQuery))
 						.exceptionally(ex -> Optional.empty())
-						.thenAccept(metrics::add);
-				requests[count++] = future;
+						.thenAccept(metric -> metrics.put(prometheusQuery, metric));
+				requests.add(future);
 			}
 		}
 
-		CompletableFuture.allOf(requests).join();
+		CompletableFuture.allOf(requests.toArray(new CompletableFuture[0])).join();
 
-		Optional<Double> totalRam = metrics.get(0);
-		Optional<Double> availableRam = metrics.get(1);
-		Optional<Double> cpuUsage = metrics.get(2);
+		Optional<Double> totalRam = metrics.get(PrometheusQueryEnum.TOTAL_MEMORY);
+		Optional<Double> availableRam = metrics.get(PrometheusQueryEnum.AVAILABLE_MEMORY);
+		Optional<Double> cpuUsage = metrics.get(PrometheusQueryEnum.CPU_USAGE_PERCENTAGE);
 		if (totalRam.isPresent() && availableRam.isPresent() && cpuUsage.isPresent()) {
 			double totalRamValue = totalRam.get();
 			double availableRamValue = availableRam.get();
 			double predictedRamUsage = (1.0 - ((availableRamValue - expectedMemoryConsumption) / totalRamValue)) * 100.0;
 			boolean hasEnoughMemory = predictedRamUsage < maximumRamPercentage;
-			log.info("Node {} {} enough ram, predictedRamUsage={} {} maximumRamPercentage={}",
-				hostAddress, hasEnoughMemory ? "has" : "doesn't have", predictedRamUsage, hasEnoughMemory ? "<" : ">=", maximumRamPercentage);
+			log.info("Node {} {} enough ram, predictedRamUsage={} {} maximumRamPercentage={} (total ram={}, available ram={})",
+				hostAddress, hasEnoughMemory ? "has" : "doesn't have", predictedRamUsage, hasEnoughMemory ? "<" : ">=",
+				maximumRamPercentage, totalRamValue, availableRamValue);
 			double cpuUsageValue = cpuUsage.get();
 			boolean hasEnoughCpu = cpuUsageValue < maximumCpuPercentage;
 			log.info("Node {} {} enough cpu, cpuUsage={} {} maximumCpuPercentage={}",
-				hostAddress, hasEnoughCpu ? "has" : "doesn't have", cpuUsageValue, hasEnoughCpu ? "<" : ">=", maximumCpuPercentage);
+				hostAddress, hasEnoughCpu ? "has" : "doesn't have", cpuUsageValue, hasEnoughCpu ? "<" : ">=",
+				maximumCpuPercentage);
 			return hasEnoughMemory && hasEnoughCpu;
 		}
 		log.info("Node {} doesn't have enough capacity: failed to fetch metrics", hostAddress);

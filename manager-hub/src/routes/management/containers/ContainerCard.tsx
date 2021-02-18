@@ -92,7 +92,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     private topContextMenu = (): JSX.Element[] => {
         const container = this.getContainer();
         const menus = [];
-        if (container?.labels['serviceType'] !== 'SYSTEM') {
+        if (container?.labels['serviceType'] !== 'SYSTEM' && container?.state !== 'down') {
             menus.push(
                 <ContextSubMenuItem<IContainer, INode> className={'blue-text'}
                                                        menu={'Replicar'}
