@@ -34,10 +34,8 @@ import com.spotify.docker.client.messages.swarm.NodeSpec;
 import com.spotify.docker.client.messages.swarm.SwarmJoin;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.configurations.Configuration;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
@@ -47,7 +45,6 @@ import pt.unl.fct.miei.usmanagement.manager.nodes.NodeConstants;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.PlaceEnum;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.bash.BashService;
 import pt.unl.fct.miei.usmanagement.manager.services.configurations.ConfigurationsService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.DockerCoreService;
@@ -77,17 +74,14 @@ public class DockerSwarmService {
 	private final BashService bashService;
 	private final NodesService nodesService;
 	private final ConfigurationsService configurationsService;
-	private final Environment environment;
 
 	public DockerSwarmService(DockerCoreService dockerCoreService, @Lazy HostsService hostsService,
-							  BashService bashService, @Lazy NodesService nodesService,
-							  ConfigurationsService configurationsService, Environment environment) {
+							  BashService bashService, @Lazy NodesService nodesService, ConfigurationsService configurationsService) {
 		this.dockerCoreService = dockerCoreService;
 		this.hostsService = hostsService;
 		this.bashService = bashService;
 		this.nodesService = nodesService;
 		this.configurationsService = configurationsService;
-		this.environment = environment;
 	}
 
 	public DockerClient getSwarmLeader() {
@@ -135,11 +129,8 @@ public class DockerSwarmService {
 		String nodeId = nodeIdRegexExpression.group(0);
 		configurationsService.addConfiguration(nodeId);
 		try {
-			Map<String, String> customLabels = new HashMap<>(1);
-			if (Objects.equals(environment.getProperty(ContainerConstants.Environment.Manager.ID), ServiceConstants.Name.MASTER_MANAGER)) {
-				customLabels.put(NodeConstants.Label.MASTER_MANAGER, String.valueOf(true));
-			}
-			setNodeLabels(nodeId, listenAddress, username, hostAddress.getCoordinates(), hostAddress.getRegion(), hostAddress.getPlace(), customLabels);
+			setNodeLabels(nodeId, listenAddress, username, hostAddress.getCoordinates(), hostAddress.getRegion(),
+				hostAddress.getPlace(), Collections.singletonMap(NodeConstants.Label.MANAGER_NODE, String.valueOf(true)));
 			createNetworkOverlay(hostAddress);
 			Node swarmNode = getNode(nodeId);
 			return nodesService.addNode(swarmNode);

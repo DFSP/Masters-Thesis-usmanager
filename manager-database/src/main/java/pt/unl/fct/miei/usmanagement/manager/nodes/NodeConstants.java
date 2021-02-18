@@ -35,7 +35,7 @@ public final class NodeConstants {
 		public static final String USERNAME = "username";
 		public static final String COORDINATES = "coordinates";
 		public static final String REGION = "region";
-		public static final String MASTER_MANAGER = "masterManager";
+		public static final String MANAGER_NODE = "managerNode";
 		public static final String PLACE = "place";
 
 	}
