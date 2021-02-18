@@ -1,11 +1,14 @@
 package pt.unl.fct.miei.usmanagement.manager.sync;
 
+import com.amazonaws.services.ec2.model.Instance;
+import com.amazonaws.services.ec2.model.InstanceState;
 import com.spotify.docker.client.messages.swarm.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.services.configurations.ConfigurationsService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerContainer;
@@ -14,6 +17,10 @@ import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.ManagerStatus;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeAvailability;
+import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.CloudHostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.aws.AwsInstanceState;
+import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.aws.AwsService;
+import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.aws.AwsSimpleInstance;
 
 import java.util.Iterator;
 import java.util.List;
@@ -27,28 +34,114 @@ import java.util.stream.Collectors;
 @Service
 public class SyncService {
 
+	private final static int CLOUD_HOSTS_DATABASE_SYNC_INTERVAL = 45000;
 	private final static int CONTAINERS_DATABASE_SYNC_INTERVAL = 10000;
 	private final static int NODES_DATABASE_SYNC_INTERVAL = 10000;
 
+	private final CloudHostsService cloudHostsService;
+	private final AwsService awsService;
 	private final ContainersService containersService;
 	private final DockerContainersService dockerContainersService;
 	private final NodesService nodesService;
 	private final DockerSwarmService dockerSwarmService;
 	private final ConfigurationsService configurationsService;
 
+	private Timer cloudHostsDatabaseSyncTimer;
 	private Timer containersDatabaseSyncTimer;
 	private Timer nodesDatabaseSyncTimer;
 	private final String externalId;
 
-	public SyncService(ContainersService containersService, DockerContainersService dockerContainersService,
+	public SyncService(CloudHostsService cloudHostsService, AwsService awsService, ContainersService containersService,
+					   DockerContainersService dockerContainersService,
 					   NodesService nodesService, DockerSwarmService dockerSwarmService,
 					   ConfigurationsService configurationsService, Environment environment) {
+		this.cloudHostsService = cloudHostsService;
+		this.awsService = awsService;
 		this.containersService = containersService;
 		this.dockerContainersService = dockerContainersService;
 		this.nodesService = nodesService;
 		this.dockerSwarmService = dockerSwarmService;
 		this.configurationsService = configurationsService;
 		this.externalId = environment.getProperty(ContainerConstants.Environment.Manager.ID);
+	}
+
+	public void startCloudHostsDatabaseSynchronization() {
+		cloudHostsDatabaseSyncTimer = new Timer("cloud-hosts-database-synchronization", true);
+		cloudHostsDatabaseSyncTimer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				try {
+					synchronizeCloudHostsDatabase();
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}, CLOUD_HOSTS_DATABASE_SYNC_INTERVAL, CLOUD_HOSTS_DATABASE_SYNC_INTERVAL);
+	}
+
+	public void stopCloudHostsDatabaseSynchronization() {
+		if (cloudHostsDatabaseSyncTimer != null) {
+			cloudHostsDatabaseSyncTimer.cancel();
+			log.info("Stopped database cloud hosts synchronization");
+		}
+	}
+
+	public List<CloudHost> synchronizeCloudHostsDatabase() {
+		log.info("Synchronizing cloud hosts data with amazon");
+		List<CloudHost> cloudHosts = cloudHostsService.getCloudHostsAndRelations();
+		List<Instance> awsInstances = awsService.getInstances();
+		Map<String, Instance> awsInstancesIds = awsInstances.stream()
+			.collect(Collectors.toMap(Instance::getInstanceId, instance -> instance));
+		Iterator<CloudHost> cloudHostsIterator = cloudHosts.iterator();
+		// Remove invalid and update cloud host entities
+		while (cloudHostsIterator.hasNext()) {
+			CloudHost cloudHost = cloudHostsIterator.next();
+			String instanceId = cloudHost.getInstanceId();
+			if (configurationsService.isConfiguring(instanceId)) {
+				log.info("Instance {} is currently being configured, skipping", instanceId);
+				continue;
+			}
+			if (!awsInstancesIds.containsKey(instanceId)) {
+				cloudHostsService.deleteCloudHost(cloudHost);
+				cloudHostsIterator.remove();
+				log.info("Removing invalid cloud host {}", instanceId);
+			}
+			else {
+				Instance instance = awsInstancesIds.get(instanceId);
+				InstanceState currentState = instance.getState();
+				InstanceState savedState = cloudHost.getState();
+				if (Objects.equals(currentState.getCode(), AwsInstanceState.TERMINATED.getCode())) {
+					cloudHostsService.deleteCloudHost(cloudHost);
+					log.info("Removing terminated cloud host {}", instanceId);
+				}
+				else {
+					if (!Objects.equals(currentState, savedState)) {
+						log.info("Updating state of cloud host {}", cloudHost.getInstanceId());
+						cloudHost.setState(currentState);
+						cloudHostsService.updateCloudHost(cloudHost);
+					}
+					String currentPublicIpAddress = instance.getPublicIpAddress();
+					String savedPublicIpAddress = cloudHost.getPublicIpAddress();
+					if (!Objects.equals(currentPublicIpAddress, savedPublicIpAddress)) {
+						log.info("Updating public ip address of cloud host {}", cloudHost.getInstanceId());
+						cloudHostsService.updateAddress(cloudHost, currentPublicIpAddress);
+					}
+				}
+
+			}
+		}
+		// Add missing cloud host entities
+		awsInstances.forEach(instance -> {
+			String instanceId = instance.getInstanceId();
+			if (!configurationsService.isConfiguring(instanceId) && instance.getState().getCode() != AwsInstanceState.TERMINATED.getCode()
+				&& !cloudHostsService.hasCloudHost(instanceId)) {
+				CloudHost cloudHost = cloudHostsService.addCloudHostFromSimpleInstance(new AwsSimpleInstance(instance));
+				cloudHosts.add(cloudHost);
+			}
+		});
+		log.debug("Finished cloud hosts synchronization");
+		return cloudHosts;
 	}
 
 	public void startContainersDatabaseSynchronization() {

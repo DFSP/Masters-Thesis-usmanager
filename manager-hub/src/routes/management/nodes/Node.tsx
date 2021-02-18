@@ -279,7 +279,7 @@ class Node extends BaseComponent<Props, State> {
                 .filter(instance => instance.state.name === 'running')
                 .map(instance => instance.publicIpAddress)
                 .includes(node.publicIpAddress)
-            && !((node as INode).labels?.['masterManager'] === 'true')) {
+            && !((node as INode).labels?.['managerNode'] === 'true')) {
             if (node.state === 'down') {
                 buttons.push({
                     button:
@@ -508,7 +508,7 @@ class Node extends BaseComponent<Props, State> {
                                      values: ['MANAGER', 'WORKER']
                                  }}
                                  disabled={Object.values(this.props.nodes).filter(node => node.role === 'MANAGER').length === 1 && formNode.role === 'MANAGER'
-                                 || (node && 'labels' in node && (node as INode).labels?.['masterManager'] === 'true')}/>
+                                 || (node && 'labels' in node && (node as INode).labels?.['managerNode'] === 'true')}/>
                         : key === 'publicIpAddress'
                             ? <Field key={index}
                                      id={key}
@@ -594,7 +594,7 @@ class Node extends BaseComponent<Props, State> {
                                   }}
                             // delete button is never present on new nodes, so a type cast is safe
                               delete={Object.values(this.props.nodes).filter(node => node.role === 'MANAGER').length === 1 && node.role === 'MANAGER'
-                              || (node as INode).labels?.['masterManager'] === 'true' || (node as INode).state !== 'down'
+                              || (node as INode).labels?.['managerNode'] === 'true' || (node as INode).state !== 'down'
                                   ? undefined
                                   : {
                                       textButton: manager === undefined ? 'Apagar' : 'Remover do swarm',

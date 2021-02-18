@@ -1430,7 +1430,7 @@ public class DatabaseLoader {
 		Map.Entry<String, Service> memcachedProfile = associateServiceToApp(appName, "memcached-profile", 11213, 11211, ServiceTypeEnum.DATABASE,
 			Set.of("MEMCACHED_CACHE_SIZE=128", "MEMCACHED_THREADS=2"), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(memcachedProfile.getKey(), memcachedProfile.getValue());
-		Map.Entry<String, Service> search = associateServiceToApp(appName, "search", 6666, 8082, ServiceTypeEnum.BACKEND,
+		Map.Entry<String, Service> search = associateServiceToApp(appName, "search", 6677, 8082, ServiceTypeEnum.BACKEND,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(search.getKey(), search.getValue());
 		Map.Entry<String, Service> geo = associateServiceToApp(appName, "geo", 6777, 8083, ServiceTypeEnum.BACKEND,

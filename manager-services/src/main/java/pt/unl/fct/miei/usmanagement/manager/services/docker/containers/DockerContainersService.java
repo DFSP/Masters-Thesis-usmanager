@@ -148,7 +148,6 @@ public class DockerContainersService {
 				String address = String.format("%s:%d", hostname, publicPort);
 				dynamicLaunchParams.put(service.getOutputLabel(), address);
 			});
-			//TODO rever tempo de espera, é preciso? Timing.sleep(DELAY_BETWEEN_CONTAINER_LAUNCH, TimeUnit.MILLISECONDS);
 		});
 		return serviceContainers;
 	}

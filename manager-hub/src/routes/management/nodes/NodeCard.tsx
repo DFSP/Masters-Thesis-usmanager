@@ -97,7 +97,7 @@ class NodeCard extends BaseComponent<Props, State> {
     private topContextMenu = (): JSX.Element[] => {
         const node = this.getNode();
         const menus = [];
-        if (!((node as INode).labels?.['masterManager'] === 'true')) {
+        if (!((node as INode).labels?.['managerNode'] === 'true')) {
             if ((node as INode).state !== 'down') {
                 menus.push(<ActionContextMenuItem
                     className='blue-text'
@@ -202,7 +202,7 @@ class NodeCard extends BaseComponent<Props, State> {
                          loading={loading}
                          topContextMenuItems={this.topContextMenu()}
                          bottomContextMenuItems={this.contextMenu()}
-                         delete={(node as INode).labels?.['masterManager'] === 'true' || (node as INode).state !== 'down'
+                         delete={(node as INode).labels?.['managerNode'] === 'true' || (node as INode).state !== 'down'
                              ? undefined
                              : {
                                  textButton: this.props.manager === undefined ? 'Apagar' : 'Remover do swarm',

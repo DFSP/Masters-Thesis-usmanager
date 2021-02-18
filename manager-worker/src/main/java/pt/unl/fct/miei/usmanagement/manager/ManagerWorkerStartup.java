@@ -82,6 +82,7 @@ public class ManagerWorkerStartup implements ApplicationListener<ApplicationRead
 		hostsService.setupWorkerManagerHost(hostAddress, NodeRole.MANAGER);
 		servicesMonitoringService.initServiceMonitorTimer();
 		hostsMonitoringService.initHostMonitorTimer();
+		syncService.startCloudHostsDatabaseSynchronization();
 		syncService.startContainersDatabaseSynchronization();
 		syncService.startNodesDatabaseSynchronization();
 		heartbeatService.startHeartbeat();
