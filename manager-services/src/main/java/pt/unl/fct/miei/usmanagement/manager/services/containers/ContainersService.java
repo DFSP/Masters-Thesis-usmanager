@@ -63,12 +63,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManage
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -488,6 +483,17 @@ public class ContainersService {
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.FRONTEND.name()),
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.BACKEND.name())))
 			.stream().filter(container -> !configurationsService.isConfiguring(container.getId())).collect(Collectors.toList());
+	}
+
+	public List<Container> getOwnAppContainers() {
+		return getContainersWithLabels(Set.of(
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.FRONTEND.name()),
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.BACKEND.name())))
+			.stream().filter(container ->
+				!configurationsService.isConfiguring(container.getId()) &&
+					Objects.equals(container.getManagerId(), environment.getProperty(ContainerConstants.Environment.Manager.ID))
+			).collect(Collectors.toList()
+			);
 	}
 
 	public List<Container> getDatabaseContainers() {

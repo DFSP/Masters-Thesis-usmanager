@@ -152,6 +152,10 @@ public class LocationRequestsService {
 	}
 
 	public Map<Node, Map<String, Integer>> getNodesLocationRequests() {
+		return getNodesLocationRequests(null, false);
+	}
+
+	public Map<Node, Map<String, Integer>> getNodesLocationRequests(Long interval, boolean manualRequest) {
 		Map<Node, Map<String, Integer>> nodeLocationRequests = new HashMap<>();
 
 		List<Node> nodes = nodesService.getReadyNodes();
@@ -163,7 +167,7 @@ public class LocationRequestsService {
 				.map(c -> c.getPorts().stream().findFirst().get().getPublicPort());
 			if (port.isPresent()) {
 				CompletableFuture<?> request = CompletableFuture
-					.supplyAsync(() -> getNodeLocationRequests(hostname, port.get()))
+					.supplyAsync(() -> getNodeLocationRequests(hostname, port.get(), interval, manualRequest))
 					.thenAccept(locationRequests -> nodeLocationRequests.put(node, locationRequests));
 				requests.add(request);
 			}
@@ -177,15 +181,22 @@ public class LocationRequestsService {
 		return nodeLocationRequests;
 	}
 
-	public Map<String, Integer> getNodeLocationRequests(String hostname, int port) {
+	public Map<String, Integer> getNodeLocationRequests(String hostname, int port, Long interval, boolean manualRequest) {
 		String url = String.format("http://%s:%s/api/location/requests?aggregation", hostname, port);
 		long currentRequestTime = System.currentTimeMillis();
-		Long interval = lastRequestTime.get(hostname);
-		if (interval != null && interval > 0) {
-			interval = currentRequestTime - interval;
+		if (interval != null) {
 			url += String.format("&interval=%d", interval);
 		}
-		lastRequestTime.put(hostname, interval);
+		else {
+			interval = lastRequestTime.get(hostname);
+			if (interval != null && interval > 0) {
+				interval = currentRequestTime - interval;
+				url += String.format("&interval=%d", interval);
+			}
+			if (!manualRequest) {
+				lastRequestTime.put(hostname, interval);
+			}
+		}
 
 		log.info("Requesting location requests from {}", url);
 

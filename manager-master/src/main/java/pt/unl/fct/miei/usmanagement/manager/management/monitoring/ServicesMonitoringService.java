@@ -26,6 +26,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.monitoring;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.core.env.Environment;
 import org.springframework.data.util.Pair;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.config.ManagerMasterProperties;
@@ -45,6 +46,8 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerContainer;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.location.LocationRequestsService;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.ContainerEvent;
@@ -97,6 +100,8 @@ public class ServicesMonitoringService {
 	private final AppSimulatedMetricsService appSimulatedMetricsService;
 	private final ServiceSimulatedMetricsService serviceSimulatedMetricsService;
 	private final ContainerSimulatedMetricsService containerSimulatedMetricsService;
+	private final DockerContainersService dockerContainersService;
+	private final Environment environment;
 
 	private final long monitorPeriod;
 	private final int stopContainerOnEventCount;
@@ -115,7 +120,8 @@ public class ServicesMonitoringService {
 									 AppSimulatedMetricsService appSimulatedMetricsService,
 									 ServiceSimulatedMetricsService serviceSimulatedMetricsService,
 									 ContainerSimulatedMetricsService containerSimulatedMetricsService,
-									 ManagerMasterProperties masterManagerProperties, MonitoringProperties monitoringProperties) {
+									 DockerContainersService dockerContainersService, Environment environment, ManagerMasterProperties masterManagerProperties,
+									 MonitoringProperties monitoringProperties) {
 		this.serviceMonitoringLogs = serviceMonitoringLogs;
 		this.servicesMonitoring = servicesMonitoring;
 		this.containersService = containersService;
@@ -129,6 +135,8 @@ public class ServicesMonitoringService {
 		this.appSimulatedMetricsService = appSimulatedMetricsService;
 		this.serviceSimulatedMetricsService = serviceSimulatedMetricsService;
 		this.containerSimulatedMetricsService = containerSimulatedMetricsService;
+		this.dockerContainersService = dockerContainersService;
+		this.environment = environment;
 		this.monitorPeriod = monitoringProperties.getServices().getPeriod();
 		this.stopContainerOnEventCount = monitoringProperties.getServices().getStopEventCount();
 		this.replicateContainerOnEventCount = monitoringProperties.getServices().getReplicateEventCount();
@@ -245,7 +253,7 @@ public class ServicesMonitoringService {
 	}
 
 	private void monitorServicesTask(int interval) {
-		List<Container> monitoringContainers = containersService.getAppContainers();
+		List<DockerContainer> monitoringContainers = dockerContainersService.getAppContainers();
 
 		Map<String, List<ServiceDecisionResult>> containersDecisions = new HashMap<>();
 
@@ -253,7 +261,7 @@ public class ServicesMonitoringService {
 
 			HostAddress hostAddress = container.getHostAddress();
 			String containerId = container.getId();
-			String serviceName = container.getServiceName();
+			String serviceName = container.getLabels().get(ContainerConstants.Label.SERVICE_NAME);
 
 			// Metrics from docker
 			Map<String, Double> stats = serviceMetricsService.getContainerStats(hostAddress, containerId);

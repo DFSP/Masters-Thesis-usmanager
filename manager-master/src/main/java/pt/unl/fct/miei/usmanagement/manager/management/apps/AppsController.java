@@ -110,7 +110,8 @@ public class AppsController {
 
 	@PostMapping("/{appName}/launch")
 	public Map<String, List<Container>> launch(@PathVariable String appName, @RequestBody Coordinates coordinates) {
-		return workerManagersService.launchApp(appName, coordinates);
+		return appsService.launch(appName, coordinates);
+		//return workerManagersService.launchApp(appName, coordinates);
 	}
 
 	@GetMapping("/{appId}/rules")

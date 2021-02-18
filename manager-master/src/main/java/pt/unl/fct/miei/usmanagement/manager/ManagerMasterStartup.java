@@ -94,12 +94,10 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 		if (mode != Mode.LOCAL) {
 			syncService.startCloudHostsDatabaseSynchronization();
 		}
-		if (mode == Mode.LOCAL) {
-			servicesMonitoringService.initServiceMonitorTimer();
-			hostsMonitoringService.initHostMonitorTimer();
-		}
 		syncService.startContainersDatabaseSynchronization();
 		syncService.startNodesDatabaseSynchronization();
+		servicesMonitoringService.initServiceMonitorTimer();
+		hostsMonitoringService.initHostMonitorTimer();
 	}
 
 	private void requireEnvVars() {

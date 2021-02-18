@@ -63,34 +63,33 @@ public class HostMetricsService {
 	public boolean hostHasEnoughResources(HostAddress hostAddress, double expectedMemoryConsumption) {
 		Optional<Integer> port = containersService.getSingletonContainer(hostAddress, ServiceConstants.Name.PROMETHEUS)
 			.map(c -> c.getPorts().stream().findFirst().get().getPublicPort());
+		if (port.isEmpty()) {
+			log.info("Failed to find prometheus container on host {}", hostAddress);
+			return false;
+		}
 
 		List<PrometheusQueryEnum> prometheusQueries = List.of(
-				PrometheusQueryEnum.TOTAL_MEMORY,
-				PrometheusQueryEnum.AVAILABLE_MEMORY,
-				PrometheusQueryEnum.CPU_USAGE_PERCENTAGE);
+			PrometheusQueryEnum.TOTAL_MEMORY,
+			PrometheusQueryEnum.AVAILABLE_MEMORY,
+			PrometheusQueryEnum.CPU_USAGE_PERCENTAGE);
 
 		Map<PrometheusQueryEnum, Optional<Double>> metrics = new HashMap<>(prometheusQueries.size());
 
-		List<CompletableFuture<?>> requests = new LinkedList<>();
+		CompletableFuture<?>[] requests = new CompletableFuture[prometheusQueries.size()];
+		int count = 0;
 		for (PrometheusQueryEnum prometheusQuery : prometheusQueries) {
-			if (port.isEmpty()) {
-				metrics.put(prometheusQuery, Optional.empty());
-			}
-			else {
-				CompletableFuture<?> future = CompletableFuture
-						.supplyAsync(() -> prometheusService.getStat(hostAddress, port.get(), prometheusQuery))
-						.exceptionally(ex -> Optional.empty())
-						.thenAccept(metric -> metrics.put(prometheusQuery, metric));
-				requests.add(future);
-			}
+			CompletableFuture<?> future = CompletableFuture
+				.supplyAsync(() -> prometheusService.getStat(hostAddress, port.get(), prometheusQuery))
+				.exceptionally(ex -> Optional.empty())
+				.thenAccept(metric -> metrics.put(prometheusQuery, metric));
+			requests[count++] = future;
 		}
-
-		CompletableFuture.allOf(requests.toArray(new CompletableFuture[0])).join();
+		CompletableFuture.allOf(requests).join();
 
 		Optional<Double> totalRam = metrics.get(PrometheusQueryEnum.TOTAL_MEMORY);
 		Optional<Double> availableRam = metrics.get(PrometheusQueryEnum.AVAILABLE_MEMORY);
 		Optional<Double> cpuUsage = metrics.get(PrometheusQueryEnum.CPU_USAGE_PERCENTAGE);
-		if (totalRam.isPresent() && availableRam.isPresent() && cpuUsage.isPresent()) {
+		if (totalRam != null && totalRam.isPresent() && availableRam != null && availableRam.isPresent() && cpuUsage != null && cpuUsage.isPresent()) {
 			double totalRamValue = totalRam.get();
 			double availableRamValue = availableRam.get();
 			double predictedRamUsage = (1.0 - ((availableRamValue - expectedMemoryConsumption) / totalRamValue)) * 100.0;

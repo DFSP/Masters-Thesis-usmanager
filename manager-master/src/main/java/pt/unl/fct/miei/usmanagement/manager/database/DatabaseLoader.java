@@ -830,16 +830,18 @@ public class DatabaseLoader {
 													 Set<String> environment, ServicesService servicesService,
 													 String dockerHubUsername, List<String> launch,
 													 Double expectedMemoryConsumption) {
-		String name = appName.toLowerCase().replace(" ", "-") + "-" + serviceName;
+		String app = appName.toLowerCase().replace(" ", "-");
+		String repositoryName = app + "-" + serviceName.toLowerCase().replace(" ", "-");
+		serviceName = serviceName.equalsIgnoreCase("frontend") ? app : repositoryName;
 		Service service;
 		try {
-			service = servicesService.getService(name);
+			service = servicesService.getService(serviceName);
 		}
 		catch (EntityNotFoundException ignored) {
-			String launchCommand = launch == null ? null : launch.stream().map(param -> "${" + param + "Host}").collect(Collectors.joining(" "));
+			String launchCommand = launch == null ? null : launch.stream().map(param -> "${" + app + "-" + param + "Host}").collect(Collectors.joining(" "));
 			service = Service.builder()
-				.serviceName(name)
-				.dockerRepository(dockerHubUsername + "/" + name)
+				.serviceName(serviceName)
+				.dockerRepository(dockerHubUsername + "/" + repositoryName)
 				.defaultExternalPort(defaultExternalPort)
 				.defaultInternalPort(defaultInternalPort)
 				.launchCommand(type == ServiceTypeEnum.DATABASE
@@ -853,7 +855,7 @@ public class DatabaseLoader {
 				.build();
 			service = servicesService.addService(service);
 		}
-		return Map.entry(name, service);
+		return Map.entry(repositoryName, service);
 	}
 
 	@Transactional
