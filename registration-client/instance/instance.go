@@ -57,6 +57,8 @@ func init() {
 }
 
 func Register() error {
+	reglog.Logger.Infof("Service data: service name %s, hostname %s, port %d, latitude %d, longitude %d", Service, Hostname, Port, Latitude, Longitude)
+
 	Service = strings.ToLower(Service)
 	eurekaUrl := fmt.Sprintf("http://%s/eureka", eurekaAddress)
 	EurekaServer = eureka.NewConn(eurekaUrl)
@@ -86,12 +88,7 @@ func Register() error {
 		HealthCheckUrl: fmt.Sprintf("%s:%d/health", Hostname, Port),
 
 		CountryId: 1,
-		DataCenterInfo: eureka.DataCenterInfo{
-			Name: "Amazon",
-			Metadata: eureka.AmazonMetadataType{
-				InstanceID: instanceId,
-			},
-		},
+		DataCenterInfo: nil,
 	}
 	Instance.SetMetadataString("management.port", strconv.Itoa(Port))
 	Instance.SetMetadataString("latitude", strconv.FormatFloat(Latitude, 'f', -1, 64))
