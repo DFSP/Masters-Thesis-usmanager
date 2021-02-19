@@ -37,6 +37,7 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.MethodNotAllowedException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
@@ -76,6 +77,9 @@ import java.util.stream.Stream;
 @Slf4j
 @Service
 public class HostsService {
+
+	private static final double HOST_DISTANCE_FACTOR = 1.25;
+	private static final double NEW_HOST_DISTANCE_FACTOR = 1.5;
 
 	private final NodesService nodesService;
 	private final ContainersService containersService;
@@ -378,14 +382,61 @@ public class HostsService {
 			double anotherDistance = anotherNode.getCoordinates().distanceTo(coordinates);
 			return Double.compare(oneDistance, anotherDistance);
 		});
-		HostAddress hostAddress;
+		EdgeHost closestEdgeHost = getClosestInactiveEdgeHost(coordinates);
+		double closestEdgeHostDistance = closestEdgeHost == null ? Double.MAX_VALUE : closestEdgeHost.getCoordinates().distanceTo(coordinates);
+		CloudHost closestCloudHost = getClosestInactiveCloudHost(coordinates);
+		double closestCloudHostDistance = closestCloudHost == null ? Double.MAX_VALUE : closestCloudHost.getAwsRegion().getCoordinates().distanceTo(coordinates);
+		AwsRegion closestAwsRegion = cloudHostsService.getClosestAwsRegion(coordinates);
+		double closestAwsRegionDistance = closestAwsRegion.getCoordinates().distanceTo(coordinates);
+		HostAddress hostAddress = null;
 		if (!nodes.isEmpty()) {
-			hostAddress = nodes.get(0).getHostAddress();
+			pt.unl.fct.miei.usmanagement.manager.nodes.Node closestNode = nodes.get(0);
+			double distance = closestNode.getCoordinates().distanceTo(coordinates);
+			if (distance < closestEdgeHostDistance * HOST_DISTANCE_FACTOR
+				&& distance < closestCloudHostDistance * HOST_DISTANCE_FACTOR
+				&& distance < closestAwsRegionDistance * NEW_HOST_DISTANCE_FACTOR) {
+				hostAddress = nodes.get(0).getHostAddress();
+			}
 		}
-		else {
+		if (hostAddress == null && (closestEdgeHost != null || closestCloudHost != null)) {
+			if (closestEdgeHostDistance < closestCloudHostDistance) {
+				hostAddress = closestEdgeHost.getAddress();
+			}
+			else {
+				hostAddress = closestCloudHost.getAddress();
+			}
+		}
+		if (hostAddress == null) {
 			hostAddress = cloudHostsService.launchInstance(coordinates).getAddress();
 		}
+
 		return hostAddress;
+	}
+
+	public EdgeHost getClosestInactiveEdgeHost(Coordinates coordinates) {
+		List<EdgeHost> edgeHosts = edgeHostsService.getInactiveEdgeHosts();
+		edgeHosts.sort((oneHost, anotherHost) -> {
+			double oneDistance = oneHost.getCoordinates().distanceTo(coordinates);
+			double anotherDistance = anotherHost.getCoordinates().distanceTo(coordinates);
+			return Double.compare(oneDistance, anotherDistance);
+		});
+		if (edgeHosts.size() > 0) {
+			return edgeHosts.get(0);
+		}
+		return null;
+	}
+
+	public CloudHost getClosestInactiveCloudHost(Coordinates coordinates) {
+		List<CloudHost> cloudHosts = cloudHostsService.getInactiveCloudHosts();
+		cloudHosts.sort((oneHost, anotherHost) -> {
+			double oneDistance = oneHost.getAwsRegion().getCoordinates().distanceTo(coordinates);
+			double anotherDistance = anotherHost.getAwsRegion().getCoordinates().distanceTo(coordinates);
+			return Double.compare(oneDistance, anotherDistance);
+		});
+		if (cloudHosts.size() > 0) {
+			return cloudHosts.get(0);
+		}
+		return null;
 	}
 
 	public HostAddress getClosestHost(Coordinates coordinates, List<EdgeHost> edgeHosts, List<CloudHost> cloudHosts) {
