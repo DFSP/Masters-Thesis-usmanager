@@ -301,7 +301,9 @@ public class DockerContainersService {
 					.replace("${hostname}", hostAddress.getPublicIpAddress())
 					.replace("${externalPort}", String.valueOf(externalPort))
 					.replace("${internalPort}", String.valueOf(internalPort))
-					.replace("${registrationClientPort}", String.valueOf(registrationProperties.getClient().getPort()));
+					.replace("${registrationClientPort}", String.valueOf(registrationProperties.getClient().getPort()))
+					.replace("${latitude}", String.valueOf(hostAddress.getCoordinates().getLatitude()))
+					.replace("${longitude}", String.valueOf(hostAddress.getCoordinates().getLongitude()));
 				RegionEnum region = hostAddress.getRegion();
 				if (service.getServiceType() != ServiceTypeEnum.SYSTEM && service.getServiceType() != ServiceTypeEnum.DATABASE
 					&& (serviceDependenciesService.hasDependencies(serviceName) || serviceDependenciesService.hasDependents(serviceName))) {
@@ -347,7 +349,9 @@ public class DockerContainersService {
 				log.info("Launch command: {}", launchCommand);
 
 				List<String> containerEnvironment = new LinkedList<>();
-				containerEnvironment.add(ContainerConstants.Environment.SERVICE_REGION + "=" + region);
+				//containerEnvironment.add(ContainerConstants.Environment.SERVICE_REGION + "=" + region);
+				containerEnvironment.add(ContainerConstants.Environment.LATITUDE + "=" + hostAddress.getCoordinates().getLatitude());
+				containerEnvironment.add(ContainerConstants.Environment.LONGITUDE + "=" + hostAddress.getCoordinates().getLongitude());
 				containerEnvironment.addAll(service.getEnvironment());
 				containerEnvironment.addAll(environment);
 

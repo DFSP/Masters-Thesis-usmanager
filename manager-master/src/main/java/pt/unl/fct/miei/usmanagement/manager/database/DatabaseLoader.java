@@ -846,7 +846,7 @@ public class DatabaseLoader {
 				.defaultInternalPort(defaultInternalPort)
 				.launchCommand(type == ServiceTypeEnum.DATABASE
 					? null
-					: String.format("${externalPort} ${internalPort} ${hostname} ${registrationClientPort}%s", launchCommand != null ? " " + launchCommand : ""))
+					: String.format("${externalPort} ${internalPort} ${hostname} ${registrationClientPort} ${latitude} ${longitude}%s", launchCommand != null ? " " + launchCommand : ""))
 				.minimumReplicas(1)
 				.outputLabel(String.format("${%sHost}", serviceName))
 				.environment(environment)
@@ -1423,13 +1423,13 @@ public class DatabaseLoader {
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(frontend.getKey(), frontend.getValue());
 		Map.Entry<String, Service> profile = associateServiceToApp(appName, "profile", 6555, 8081, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, List.of("profile-db", "memcached-profile"), null);
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("profile-db", "profile-memcached"), null);
 		servicesMap.put(profile.getKey(), profile.getValue());
 		// volume - profile:/data/db
 		Map.Entry<String, Service> profileDb = associateServiceToApp(appName, "profile-db", 29017, 27017, ServiceTypeEnum.DATABASE,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(profileDb.getKey(), profileDb.getValue());
-		Map.Entry<String, Service> memcachedProfile = associateServiceToApp(appName, "memcached-profile", 11213, 11211, ServiceTypeEnum.DATABASE,
+		Map.Entry<String, Service> memcachedProfile = associateServiceToApp(appName, "profile-memcached", 11213, 11211, ServiceTypeEnum.DATABASE,
 			Set.of("MEMCACHED_CACHE_SIZE=128", "MEMCACHED_THREADS=2"), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(memcachedProfile.getKey(), memcachedProfile.getValue());
 		Map.Entry<String, Service> search = associateServiceToApp(appName, "search", 6677, 8082, ServiceTypeEnum.BACKEND,
@@ -1443,13 +1443,13 @@ public class DatabaseLoader {
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(geoDb.getKey(), geoDb.getValue());
 		Map.Entry<String, Service> rate = associateServiceToApp(appName, "rate", 6888, 8084, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, List.of("date-db", "memcached-rate"), null);
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("date-db", "rate-memcached"), null);
 		servicesMap.put(rate.getKey(), rate.getValue());
 		// volume - rate:/data/db
 		Map.Entry<String, Service> rateDb = associateServiceToApp(appName, "rate-db", 30017, 27017, ServiceTypeEnum.DATABASE,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(rateDb.getKey(), rateDb.getValue());
-		Map.Entry<String, Service> memcachedRate = associateServiceToApp(appName, "memcached-rate", 11212, 11211, ServiceTypeEnum.DATABASE,
+		Map.Entry<String, Service> memcachedRate = associateServiceToApp(appName, "rate-memcached", 11212, 11211, ServiceTypeEnum.DATABASE,
 			Set.of("MEMCACHED_CACHE_SIZE=128", "MEMCACHED_THREADS=2"), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(memcachedRate.getKey(), memcachedRate.getValue());
 		Map.Entry<String, Service> recommendation = associateServiceToApp(appName, "recommendation", 6999, 8085, ServiceTypeEnum.BACKEND,
@@ -1467,13 +1467,13 @@ public class DatabaseLoader {
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(userDb.getKey(), userDb.getValue());
 		Map.Entry<String, Service> reservation = associateServiceToApp(appName, "reservation", 7222, 8087, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, List.of("reservation-db", "memcached-reservation"), null);
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("reservation-db", "reservation-memcached"), null);
 		servicesMap.put(reservation.getKey(), reservation.getValue());
 		// volume - reservation:/data/db
 		Map.Entry<String, Service> reservationDb = associateServiceToApp(appName, "reservation-db", 32017, 27017, ServiceTypeEnum.DATABASE,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(reservationDb.getKey(), reservationDb.getValue());
-		Map.Entry<String, Service> memcachedReserve = associateServiceToApp(appName, "memcached-reservation", 11214, 11211, ServiceTypeEnum.DATABASE,
+		Map.Entry<String, Service> memcachedReserve = associateServiceToApp(appName, "reservation-memcached", 11214, 11211, ServiceTypeEnum.DATABASE,
 			Set.of("MEMCACHED_CACHE_SIZE=128", "MEMCACHED_THREADS=2"), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(memcachedReserve.getKey(), memcachedReserve.getValue());
 		// available: "14269", "5778:5778", "14268:14268", "14267", "16686:16686", "5775:5775/udp", "6831:6831/udp", "6832:6832/udp"

@@ -130,8 +130,8 @@ public class LoadBalancerService {
 
 	private LoadBalancer launchLoadBalancer(HostAddress hostAddress, NginxServer[] nginxServers) {
 		List<String> environment = new ArrayList<>();
-		environment.add(String.format("%s=%s", ContainerConstants.Environment.BASIC_AUTH_USERNAME, dockerApiProxyUsername));
-		environment.add(String.format("%s=%s", ContainerConstants.Environment.BASIC_AUTH_PASSWORD, dockerApiProxyPassword));
+		environment.add(String.format("%s=%s", ContainerConstants.Environment.LoadBalancer.BASIC_AUTH_USERNAME, dockerApiProxyUsername));
+		environment.add(String.format("%s=%s", ContainerConstants.Environment.LoadBalancer.BASIC_AUTH_PASSWORD, dockerApiProxyPassword));
 		if (nginxServers != null) {
 			environment.add(String.format("%s=%s", ContainerConstants.Environment.LoadBalancer.SERVER, new Gson().toJson(nginxServers)));
 		}

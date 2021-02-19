@@ -72,9 +72,9 @@ public class DockerApiProxyService {
 				+ "-e %s=%s -e %s=%s -e %s=http://%s:%s "
 				+ "-l %s=%b -l %s=%s -l %s=%s -l %s=%s -l %s='%s' -l %s=%s -l %s='%s' %s; fi",
 			serviceName, dockerRepository, serviceName, dockerApiProxyPort, 80, serviceName,
-			ContainerConstants.Environment.BASIC_AUTH_USERNAME, dockerApiProxyUsername,
-			ContainerConstants.Environment.BASIC_AUTH_PASSWORD, dockerApiProxyPassword,
-			ContainerConstants.Environment.PROXY_PASS, hostAddress.getPrivateIpAddress(), dockerApiPort,
+			ContainerConstants.Environment.Proxy.BASIC_AUTH_USERNAME, dockerApiProxyUsername,
+			ContainerConstants.Environment.Proxy.BASIC_AUTH_PASSWORD, dockerApiProxyPassword,
+			ContainerConstants.Environment.Proxy.PROXY_PASS, hostAddress.getPrivateIpAddress(), dockerApiPort,
 			ContainerConstants.Label.US_MANAGER, true,
 			ContainerConstants.Label.CONTAINER_TYPE, ContainerTypeEnum.SINGLETON,
 			ContainerConstants.Label.SERVICE_NAME, serviceName,

@@ -86,7 +86,12 @@ func Register() error {
 		HealthCheckUrl: fmt.Sprintf("%s:%d/health", Hostname, Port),
 
 		CountryId: 1,
-		DataCenterInfo: eureka.DataCenterInfo{},
+		DataCenterInfo: eureka.DataCenterInfo{
+			Name: "Amazon",
+			Metadata: eureka.AmazonMetadataType{
+				InstanceID: instanceId,
+			},
+		},
 	}
 	Instance.SetMetadataString("management.port", strconv.Itoa(Port))
 	Instance.SetMetadataString("latitude", strconv.FormatFloat(Latitude, 'f', -1, 64))
