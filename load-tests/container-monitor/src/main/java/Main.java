@@ -45,11 +45,12 @@ public class Main {
 	private static final int PORT = 2375;
 
 	public static void main(String[] args) throws IOException {
-		if (args.length != 2) {
-			System.err.println("Usage: java container-monitor hostname containerId");
+		if (args.length != 3) {
+			System.err.println("Usage: java container-monitor cpuCores hostname containerId");
 		}
-		final String hostname = args[0];
-		final String containerId = args[1];
+		final int cpuCores = Integer.parseInt(args[0]);
+		final String hostname = args[1];
+		final String containerId = args[2];
 		System.out.println("Monitoring container " + containerId + " on hostname " + hostname + "...");
 
 		final long startTime = System.currentTimeMillis();
@@ -59,17 +60,14 @@ public class Main {
 		final byte[] auth = String.format("%s:%s", "username", "password").getBytes();
 		final String dockerAuthorization = String.format("Basic %s", new String(Base64.getEncoder().encode(auth)));
 		final String uri = String.format("http://%s:%d", hostname, PORT);
-		final DockerClient dockerClient = DefaultDockerClient.builder()
-			.uri(uri)
+		final DockerClient dockerClient = DefaultDockerClient.builder().uri(uri)
 			.header("Authorization", dockerAuthorization)
-			.connectTimeoutMillis(CONNECTION_TIMEOUT)
-			.readTimeoutMillis(READ_TIMEOUT)
-			.build();
+			.connectTimeoutMillis(CONNECTION_TIMEOUT).readTimeoutMillis(READ_TIMEOUT).build();
 		new Timer("container-monitor", false).schedule(new TimerTask() {
 			@Override
 			public void run() {
 				try {
-					Map<String, Double> stats = getContainerStats(dockerClient, containerId);
+					Map<String, Double> stats = getContainerStats(dockerClient, containerId, cpuCores);
 					String line = String.format(Locale.US, "%s,%.0f,%.3f,%.0f,%.0f", getTimestamp(startTime), stats.get("ram"),
 						stats.get("cpu-%"), stats.get("rx-bytes"), stats.get("tx-bytes"));
 					writer.write( line + "\n");
@@ -101,7 +99,7 @@ public class Main {
 		return formatter.format(date);
 	}
 
-	private static Map<String, Double> getContainerStats(DockerClient dockerClient, String containerId) throws DockerException, InterruptedException {
+	private static Map<String, Double> getContainerStats(DockerClient dockerClient, String containerId, int cpuCores) throws DockerException, InterruptedException {
 		Map<String, Double> stats = new HashMap<>();
 		ContainerStats containerStats = dockerClient.stats(containerId);
 
@@ -109,7 +107,7 @@ public class Main {
 		CpuStats preCpuStats = containerStats.precpuStats();
 		double cpu = cpuStats.cpuUsage().totalUsage().doubleValue();
 		stats.put("cpu", cpu);
-		double cpuPercent = getContainerCpuPercent(preCpuStats, cpuStats);
+		double cpuPercent = getContainerCpuPercent(preCpuStats, cpuStats) / cpuCores;
 		stats.put("cpu-%", cpuPercent);
 		MemoryStats memoryStats = containerStats.memoryStats();
 		double ram = memoryStats.usage().doubleValue();

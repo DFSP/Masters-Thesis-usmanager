@@ -93,7 +93,6 @@ func Register() error {
 			},
 		},
 	}
-	Instance.SetMetadataString("management.port", strconv.Itoa(Port))
 	Instance.SetMetadataString("latitude", strconv.FormatFloat(Latitude, 'f', -1, 64))
 	Instance.SetMetadataString("longitude", strconv.FormatFloat(Longitude, 'f', -1, 64))
 

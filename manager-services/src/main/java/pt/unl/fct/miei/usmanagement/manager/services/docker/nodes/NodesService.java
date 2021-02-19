@@ -99,6 +99,10 @@ public class NodesService {
 		return filter == null ? getNodes() : getNodes().stream().filter(filter).collect(Collectors.toList());
 	}
 
+	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> getManagerNodes(String managerId) {
+		return getNodes(node -> node.getManagerId().equals(managerId));
+	}
+
 	public pt.unl.fct.miei.usmanagement.manager.nodes.Node getNode(String id) {
 		return nodes.findById(id).orElseThrow(() ->
 			new EntityNotFoundException(Node.class, "id", id));
@@ -345,6 +349,11 @@ public class NodesService {
 	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> updateAddress(HostAddress hostAddress, String publicIpAddress) {
 		List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes = getHostNodes(hostAddress);
 		nodes.forEach(node -> node.setPublicIpAddress(publicIpAddress));
+		return this.saveNodes(nodes);
+	}
+
+	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> saveNodes(List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes) {
+		log.info("Saving nodes {}", nodes);
 		nodes = this.nodes.saveAll(nodes);
 		nodes.forEach(kafkaService::sendNode);
 		return nodes;

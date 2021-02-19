@@ -254,7 +254,7 @@ public class ContainersService {
 		return containers.findAll();
 	}
 
-	public List<Container> getContainers(String managerId) {
+	public List<Container> getManagerContainers(String managerId) {
 		return getContainersWithLabels(Set.of(Pair.of(ContainerConstants.Environment.Manager.ID, managerId)));
 	}
 
@@ -396,7 +396,6 @@ public class ContainersService {
 		Optional<DockerContainer> dockerContainer = dockerContainersService.migrateContainer(container, hostAddress);
 		return dockerContainer.map(this::addContainerFromDockerContainer)
 			.orElseThrow(() -> new ManagerException("Unable to migrate container %s", id));
-
 	}
 
 	public Map<String, List<Container>> launchApp(List<Service> services, Coordinates coordinates) {

@@ -202,7 +202,7 @@ class NodeCard extends BaseComponent<Props, State> {
                          loading={loading}
                          topContextMenuItems={this.topContextMenu()}
                          bottomContextMenuItems={this.contextMenu()}
-                         delete={(node as INode).labels?.['managerNode'] === 'true' || (node as INode).state !== 'down'
+                         delete={((node as INode).labels?.['managerNode'] === 'true' && (node as INode).managerId === 'master-manager') || (node as INode).state !== 'down'
                              ? undefined
                              : {
                                  textButton: this.props.manager === undefined ? 'Apagar' : 'Remover do swarm',

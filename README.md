@@ -157,6 +157,9 @@ com tipo de acesso Programmatic access, e política AdministratorAccess. Substit
 
 - [Configurar chaves](https://aws.amazon.com/pt/premiumsupport/knowledge-center/ec2-ssh-key-pair-regions/) em todas as regiões disponíveis.
 
+### Bugs
+Quando existem demasiados utilizadores nos gestores: https://stackoverflow.com/questions/32968530/hikaricp-connection-is-not-available
+
 ### Licença
 
 μsManager está licenciado com a [MIT license](LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.

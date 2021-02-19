@@ -71,7 +71,8 @@ public class HostMetricsService {
 		List<PrometheusQueryEnum> prometheusQueries = List.of(
 			PrometheusQueryEnum.TOTAL_MEMORY,
 			PrometheusQueryEnum.AVAILABLE_MEMORY,
-			PrometheusQueryEnum.CPU_USAGE_PERCENTAGE);
+			PrometheusQueryEnum.CPU_USAGE_PERCENTAGE,
+			PrometheusQueryEnum.CPU_CORES);
 
 		Map<PrometheusQueryEnum, Optional<Double>> metrics = new HashMap<>(prometheusQueries.size());
 
@@ -89,7 +90,12 @@ public class HostMetricsService {
 		Optional<Double> totalRam = metrics.get(PrometheusQueryEnum.TOTAL_MEMORY);
 		Optional<Double> availableRam = metrics.get(PrometheusQueryEnum.AVAILABLE_MEMORY);
 		Optional<Double> cpuUsage = metrics.get(PrometheusQueryEnum.CPU_USAGE_PERCENTAGE);
-		if (totalRam != null && totalRam.isPresent() && availableRam != null && availableRam.isPresent() && cpuUsage != null && cpuUsage.isPresent()) {
+		Optional<Double> cpuCores = metrics.get(PrometheusQueryEnum.CPU_CORES);
+		if (totalRam != null && totalRam.isPresent()
+			&& availableRam != null
+			&& availableRam.isPresent()
+			&& cpuUsage != null && cpuUsage.isPresent()
+			&& cpuCores != null && cpuCores.isPresent()) {
 			double totalRamValue = totalRam.get();
 			double availableRamValue = availableRam.get();
 			double predictedRamUsage = (1.0 - ((availableRamValue - expectedMemoryConsumption) / totalRamValue)) * 100.0;
@@ -97,7 +103,8 @@ public class HostMetricsService {
 			log.info("Node {} {} enough ram, predictedRamUsage={} {} maximumRamPercentage={} (total ram={}, available ram={})",
 				hostAddress, hasEnoughMemory ? "has" : "doesn't have", predictedRamUsage, hasEnoughMemory ? "<" : ">=",
 				maximumRamPercentage, totalRamValue, availableRamValue);
-			double cpuUsageValue = cpuUsage.get();
+			double cpuCoresNumber = cpuCores.get();
+			double cpuUsageValue = cpuCoresNumber == 0 ? cpuUsage.get() : cpuUsage.get() / cpuCoresNumber;
 			boolean hasEnoughCpu = cpuUsageValue < maximumCpuPercentage;
 			log.info("Node {} {} enough cpu, cpuUsage={} {} maximumCpuPercentage={}",
 				hostAddress, hasEnoughCpu ? "has" : "doesn't have", cpuUsageValue, hasEnoughCpu ? "<" : ">=",
