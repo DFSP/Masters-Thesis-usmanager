@@ -57,7 +57,6 @@ func init() {
 }
 
 func Register() error {
-
 	Service = strings.ToLower(Service)
 	eurekaUrl := fmt.Sprintf("http://%s/eureka", eurekaAddress)
 	EurekaServer = eureka.NewConn(eurekaUrl)
@@ -87,7 +86,7 @@ func Register() error {
 		HealthCheckUrl: fmt.Sprintf("%s:%d/health", Hostname, Port),
 
 		CountryId: 1,
-		DataCenterInfo: nil,
+		DataCenterInfo: eureka.DataCenterInfo{},
 	}
 	Instance.SetMetadataString("management.port", strconv.Itoa(Port))
 	Instance.SetMetadataString("latitude", strconv.FormatFloat(Latitude, 'f', -1, 64))
