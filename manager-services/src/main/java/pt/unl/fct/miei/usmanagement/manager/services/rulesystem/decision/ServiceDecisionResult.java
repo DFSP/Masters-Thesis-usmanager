@@ -52,4 +52,20 @@ public final class ServiceDecisionResult extends DecisionResult {
 		this.serviceName = serviceName;
 	}
 
+	@Override
+	public int compareTo(DecisionResult o) {
+		if (this.getDecision() == o.getDecision()) {
+			if (this.getPriority() == o.getPriority()) {
+				return this.getSumFields() < o.getSumFields() ? -1 : 1;
+			}
+			else {
+				return this.getPriority() < o.getPriority() ? -1 : 1;
+			}
+		}
+		else {
+			return this.getDecision() == RuleDecisionEnum.MIGRATE
+				|| (this.getDecision() == RuleDecisionEnum.REPLICATE && o.getDecision() == RuleDecisionEnum.NONE) ? -1 : 1;
+		}
+	}
+
 }

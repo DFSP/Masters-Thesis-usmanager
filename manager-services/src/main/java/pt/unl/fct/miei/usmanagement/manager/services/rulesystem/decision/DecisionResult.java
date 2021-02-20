@@ -31,7 +31,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 import java.util.Map;
 
 @Data
-public class DecisionResult implements Comparable<DecisionResult> {
+public abstract class DecisionResult implements Comparable<DecisionResult> {
 
 	private final HostAddress hostAddress;
 	private final RuleDecisionEnum decision;
@@ -41,19 +41,6 @@ public class DecisionResult implements Comparable<DecisionResult> {
 	private final double sumFields;
 
 	@Override
-	public int compareTo(DecisionResult o) {
-		if (this.getDecision() == o.getDecision()) {
-			if (this.getPriority() == o.getPriority()) {
-				return this.getSumFields() < o.getSumFields() ? -1 : 1;
-			}
-			else {
-				return this.getPriority() < o.getPriority() ? -1 : 1;
-			}
-		}
-		else {
-			return this.getDecision() == RuleDecisionEnum.OVERWORK
-				|| (this.getDecision() == RuleDecisionEnum.UNDERWORK && o.getDecision() == RuleDecisionEnum.NONE) ? -1 : 1;
-		}
-	}
+	public abstract int compareTo(DecisionResult o);
 
 }

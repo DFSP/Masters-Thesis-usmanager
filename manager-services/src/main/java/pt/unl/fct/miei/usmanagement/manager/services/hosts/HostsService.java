@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.services.hosts;
 
+import com.google.gson.Gson;
 import com.spotify.docker.client.messages.swarm.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -40,6 +41,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
+import pt.unl.fct.miei.usmanagement.manager.nodes.NodeConstants;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
@@ -354,8 +356,12 @@ public class HostsService {
 		if (managerServicesConfiguration.getMode() == Mode.LOCAL) {
 			return getManagerHostAddress();
 		}
-		List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes = nodesService.getReadyNodes().stream().filter(node -> {
-			HostAddress hostAddress = node.getHostAddress();
+		Gson gson = new Gson();
+		List<Node> nodes = dockerSwarmService.getReadyNodes().stream().filter(node -> {
+			String publicIp = node.status().addr();
+			String privateIp = node.spec().labels().get(NodeConstants.Label.PRIVATE_IP_ADDRESS);
+			Coordinates nodeCoordinates = gson.fromJson(node.spec().labels().get(NodeConstants.Label.COORDINATES), Coordinates.class);
+			HostAddress hostAddress = new HostAddress(publicIp, privateIp, nodeCoordinates);
 			return !hostAddresses.contains(hostAddress) && hostMetricsService.hostHasEnoughResources(hostAddress, availableMemory);
 		}).collect(Collectors.toList());
 		return getClosestNode(coordinates, nodes);
@@ -373,40 +379,61 @@ public class HostsService {
 		return getClosestHost(coordinates, inactiveEdgeHosts, inactiveCloudHosts);
 	}
 
-	public HostAddress getClosestNode(Coordinates coordinates, List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes) {
+	public HostAddress getClosestNode(Coordinates coordinates, List<Node> nodes) {
+		log.info("Getting closest node of list {} to {}", nodes.stream()
+			.map(node -> node.id() + ":" + node.status().addr() + ":" + node.spec().labels().get(NodeConstants.Label.COORDINATES))
+			.collect(Collectors.toList()), coordinates);
 		if (managerServicesConfiguration.getMode() == Mode.LOCAL) {
 			return getManagerHostAddress();
 		}
+		Gson gson = new Gson();
 		nodes.sort((oneNode, anotherNode) -> {
-			double oneDistance = oneNode.getCoordinates().distanceTo(coordinates);
-			double anotherDistance = anotherNode.getCoordinates().distanceTo(coordinates);
+			Coordinates oneCoordinates = gson.fromJson(oneNode.spec().labels().get(NodeConstants.Label.COORDINATES), Coordinates.class);
+			double oneDistance = oneCoordinates.distanceTo(coordinates);
+			Coordinates anotherCoordinates = gson.fromJson(anotherNode.spec().labels().get(NodeConstants.Label.COORDINATES), Coordinates.class);
+			double anotherDistance = anotherCoordinates.distanceTo(coordinates);
+			log.info("Comparing node {} at {} with distance {} to another node {} at {} with distance {}, to coordinates {}",
+				oneNode.status().addr(), oneCoordinates, oneDistance, anotherNode.status().addr(), anotherCoordinates, anotherDistance, coordinates);
 			return Double.compare(oneDistance, anotherDistance);
 		});
+		log.info("Nodes sorted by distance: {}", nodes.stream()
+			.map(node -> node.id() + ":" + node.status().addr() + ":" + node.spec().labels().get(NodeConstants.Label.COORDINATES))
+			.collect(Collectors.toList()));
 		EdgeHost closestEdgeHost = getClosestInactiveEdgeHost(coordinates);
-		double closestEdgeHostDistance = closestEdgeHost == null ? Double.MAX_VALUE : closestEdgeHost.getCoordinates().distanceTo(coordinates);
+		Double closestEdgeHostDistance = closestEdgeHost == null ? null : closestEdgeHost.getCoordinates().distanceTo(coordinates);
 		CloudHost closestCloudHost = getClosestInactiveCloudHost(coordinates);
-		double closestCloudHostDistance = closestCloudHost == null ? Double.MAX_VALUE : closestCloudHost.getAwsRegion().getCoordinates().distanceTo(coordinates);
-		AwsRegion closestAwsRegion = cloudHostsService.getClosestAwsRegion(coordinates);
-		double closestAwsRegionDistance = closestAwsRegion.getCoordinates().distanceTo(coordinates);
+		Double closestCloudHostDistance = closestCloudHost == null ? null : closestCloudHost.getAwsRegion().getCoordinates().distanceTo(coordinates);
 		HostAddress hostAddress = null;
 		if (!nodes.isEmpty()) {
-			pt.unl.fct.miei.usmanagement.manager.nodes.Node closestNode = nodes.get(0);
-			double distance = closestNode.getCoordinates().distanceTo(coordinates);
-			if (distance < closestEdgeHostDistance * HOST_DISTANCE_FACTOR
-				&& distance < closestCloudHostDistance * HOST_DISTANCE_FACTOR
-				&& distance < closestAwsRegionDistance * NEW_HOST_DISTANCE_FACTOR) {
-				hostAddress = nodes.get(0).getHostAddress();
+			Node closestNode = nodes.get(0);
+			Coordinates closestCoordinates = gson.fromJson(closestNode.spec().labels().get(NodeConstants.Label.COORDINATES), Coordinates.class);
+			double distance = closestCoordinates.distanceTo(coordinates);
+			AwsRegion closestAwsRegion = cloudHostsService.getClosestAwsRegion(coordinates);
+			log.info("Closest aws region to {}: {}", coordinates, closestAwsRegion);
+			log.info("Closest edge host distance to coordinates {}: {}", coordinates, closestEdgeHostDistance);
+			log.info("Closest cloud host distance to coordinates {}: {}", coordinates, closestCloudHostDistance);
+			double closestAwsRegionDistance = closestAwsRegion.getCoordinates().distanceTo(coordinates);
+			if ((closestEdgeHostDistance == null || distance <= closestEdgeHostDistance * HOST_DISTANCE_FACTOR)
+				&& (closestCloudHostDistance == null || distance <= closestCloudHostDistance * HOST_DISTANCE_FACTOR)
+				&& distance <= closestAwsRegionDistance * NEW_HOST_DISTANCE_FACTOR) {
+				String publicIp = closestNode.status().addr();
+				String privateIp = closestNode.spec().labels().get(NodeConstants.Label.PRIVATE_IP_ADDRESS);
+				hostAddress = new HostAddress(publicIp, privateIp, closestCoordinates);
+				log.info("Found closest node {} at host {} at distance of {}", closestNode.id(), hostAddress.toSimpleString(), distance);
 			}
 		}
 		if (hostAddress == null && (closestEdgeHost != null || closestCloudHost != null)) {
-			if (closestEdgeHostDistance < closestCloudHostDistance) {
+			if (closestEdgeHostDistance != null && closestCloudHostDistance != null && closestEdgeHostDistance <= closestCloudHostDistance) {
 				hostAddress = closestEdgeHost.getAddress();
+				log.info("Found close edge host {}", hostAddress.toSimpleString());
 			}
-			else {
+			else if (closestCloudHost != null) {
 				hostAddress = closestCloudHost.getAddress();
+				log.info("Found close cloud host {}", hostAddress.toSimpleString());
 			}
 		}
 		if (hostAddress == null) {
+			log.info("Found no close hosts, launching new instance instead");
 			hostAddress = cloudHostsService.launchInstance(coordinates).getAddress();
 		}
 

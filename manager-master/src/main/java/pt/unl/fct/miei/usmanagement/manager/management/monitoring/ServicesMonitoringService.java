@@ -404,7 +404,8 @@ public class ServicesMonitoringService {
 				// location-request-monitor component
 				Coordinates coordinates = serviceWeightedMiddlePoint.get(serviceName);
 				if (coordinates == null) {
-					coordinates = topPriorityDecisionResult.getHostAddress().getCoordinates();
+					String containerId = topPriorityDecisionResult.getContainerId();
+					coordinates = containersService.getContainer(containerId).getHostAddress().getCoordinates();
 				}
 				double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(serviceName);
 				HostAddress hostAddress = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);
@@ -421,8 +422,9 @@ public class ServicesMonitoringService {
 					Map<String, Double> fields = topPriorityDecisionResult.getFields();
 					Coordinates coordinates = serviceWeightedMiddlePoint.get(serviceName);
 					if (coordinates == null) {
-						coordinates = topPriorityDecisionResult.getHostAddress().getCoordinates();
+						coordinates = containersService.getContainer(containerId).getHostAddress().getCoordinates();
 					}
+					log.info("Migrating container {} close to coordinates {}", containerId, coordinates);
 					double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(serviceName);
 					HostAddress toHostAddress = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);
 					String migratedContainerId = containersService.migrateContainer(containerId, toHostAddress).getId();
@@ -439,8 +441,9 @@ public class ServicesMonitoringService {
 						Map<String, Double> fields = topPriorityDecisionResult.getFields();
 						Coordinates coordinates = serviceWeightedMiddlePoint.get(serviceName);
 						if (coordinates == null) {
-							coordinates = topPriorityDecisionResult.getHostAddress().getCoordinates();
+							coordinates = containersService.getContainer(containerId).getHostAddress().getCoordinates();
 						}
+						log.info("Replicating container {} close to coordinates {}", containerId, coordinates);
 						double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(serviceName);
 						HostAddress toHostAddress = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);
 						String replicatedContainerId = containersService.replicateContainer(containerId, toHostAddress).getId();

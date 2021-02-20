@@ -303,6 +303,7 @@ public class CloudHostsService {
 			double anotherDistance = anotherRegion.getCoordinates().distanceTo(coordinates);
 			return Double.compare(oneDistance, anotherDistance);
 		});
+		log.info("Aws regions sorted by distance to {}: {}", coordinates, awsRegions.stream().map(AwsRegion::getName).collect(Collectors.toList()));
 		return awsRegions.get(0);
 	}
 

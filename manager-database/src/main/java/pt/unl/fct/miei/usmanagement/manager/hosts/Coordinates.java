@@ -30,10 +30,10 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 @AllArgsConstructor
 @Getter
-@EqualsAndHashCode
 @ToString
 public class Coordinates implements Serializable {
 
@@ -57,6 +57,9 @@ public class Coordinates implements Serializable {
 	}
 
 	public double distanceTo(Coordinates coordinates) {
+		if (this.equals(coordinates)) {
+			return 0;
+		}
 		// Spherical Law of Cosines formula. Great-circle distance
 		// d = acos( sin φ1 ⋅ sin φ2 + cos φ1 ⋅ cos φ2 ⋅ cos Δλ ) ⋅ R
 		double ph1 = this.latitude * Math.PI / 180;
@@ -66,4 +69,21 @@ public class Coordinates implements Serializable {
 		return Math.acos(Math.sin(ph1) * Math.sin(ph2) + Math.cos(ph1) * Math.cos(ph2) * Math.cos(deltaY)) * r;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		Coordinates that = (Coordinates) o;
+		return Double.compare(that.latitude, latitude) == 0 &&
+			Double.compare(that.longitude, longitude) == 0;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(latitude, longitude);
+	}
 }
