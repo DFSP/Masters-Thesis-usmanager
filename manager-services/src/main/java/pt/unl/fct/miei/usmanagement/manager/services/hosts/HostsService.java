@@ -410,8 +410,8 @@ public class HostsService {
 			double distance = closestCoordinates.distanceTo(coordinates);
 			AwsRegion closestAwsRegion = cloudHostsService.getClosestAwsRegion(coordinates);
 			log.info("Closest aws region to {}: {}", coordinates, closestAwsRegion);
-			log.info("Closest edge host distance to coordinates {}: {}", coordinates, closestEdgeHostDistance);
-			log.info("Closest cloud host distance to coordinates {}: {}", coordinates, closestCloudHostDistance);
+			log.info("Closest inactive edge host distance to {}: {}", coordinates, closestEdgeHostDistance);
+			log.info("Closest inactive cloud host distance to {}: {}", coordinates, closestCloudHostDistance);
 			double closestAwsRegionDistance = closestAwsRegion.getCoordinates().distanceTo(coordinates);
 			if ((closestEdgeHostDistance == null || distance <= closestEdgeHostDistance * HOST_DISTANCE_FACTOR)
 				&& (closestCloudHostDistance == null || distance <= closestCloudHostDistance * HOST_DISTANCE_FACTOR)
