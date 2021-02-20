@@ -403,16 +403,16 @@ public class HostsService {
 		Double closestEdgeHostDistance = closestEdgeHost == null ? null : closestEdgeHost.getCoordinates().distanceTo(coordinates);
 		CloudHost closestCloudHost = getClosestInactiveCloudHost(coordinates);
 		Double closestCloudHostDistance = closestCloudHost == null ? null : closestCloudHost.getAwsRegion().getCoordinates().distanceTo(coordinates);
+		AwsRegion closestAwsRegion = cloudHostsService.getClosestAwsRegion(coordinates);
+		double closestAwsRegionDistance = closestAwsRegion.getCoordinates().distanceTo(coordinates);
 		HostAddress hostAddress = null;
 		if (!nodes.isEmpty()) {
 			Node closestNode = nodes.get(0);
 			Coordinates closestCoordinates = gson.fromJson(closestNode.spec().labels().get(NodeConstants.Label.COORDINATES), Coordinates.class);
 			double distance = closestCoordinates.distanceTo(coordinates);
-			AwsRegion closestAwsRegion = cloudHostsService.getClosestAwsRegion(coordinates);
 			log.info("Closest aws region to {}: {}", coordinates, closestAwsRegion);
 			log.info("Closest inactive edge host distance to {}: {}", coordinates, closestEdgeHostDistance);
 			log.info("Closest inactive cloud host distance to {}: {}", coordinates, closestCloudHostDistance);
-			double closestAwsRegionDistance = closestAwsRegion.getCoordinates().distanceTo(coordinates);
 			if ((closestEdgeHostDistance == null || distance <= closestEdgeHostDistance * HOST_DISTANCE_FACTOR)
 				&& (closestCloudHostDistance == null || distance <= closestCloudHostDistance * HOST_DISTANCE_FACTOR)
 				&& distance <= closestAwsRegionDistance * NEW_HOST_DISTANCE_FACTOR) {
@@ -423,11 +423,13 @@ public class HostsService {
 			}
 		}
 		if (hostAddress == null && (closestEdgeHost != null || closestCloudHost != null)) {
-			if (closestEdgeHostDistance != null && closestCloudHostDistance != null && closestEdgeHostDistance <= closestCloudHostDistance) {
+			if (closestEdgeHostDistance != null && closestCloudHostDistance != null
+				&& closestEdgeHostDistance <= closestCloudHostDistance
+				&& closestEdgeHostDistance <=  closestAwsRegionDistance * NEW_HOST_DISTANCE_FACTOR) {
 				hostAddress = closestEdgeHost.getAddress();
 				log.info("Found close edge host {}", hostAddress.toSimpleString());
 			}
-			else if (closestCloudHost != null) {
+			else if (closestCloudHost != null && closestCloudHostDistance <= closestAwsRegionDistance * NEW_HOST_DISTANCE_FACTOR) {
 				hostAddress = closestCloudHost.getAddress();
 				log.info("Found close cloud host {}", hostAddress.toSimpleString());
 			}
