@@ -404,7 +404,6 @@ public class ServicesMonitoringService {
 	}
 
 	private void executeDecisions(Map<String, List<ServiceDecisionResult>> decisions, Map<String, Integer> replicasCount) {
-		Map<String, Coordinates> serviceWeightedMiddlePoint = requestLocationMonitoringService.getServicesWeightedMiddlePoint();
 		for (Entry<String, List<ServiceDecisionResult>> servicesDecisions : decisions.entrySet()) {
 			String serviceName = servicesDecisions.getKey();
 			List<ServiceDecisionResult> containerDecisions = servicesDecisions.getValue();
@@ -416,6 +415,7 @@ public class ServicesMonitoringService {
 			if (currentReplicas < minimumReplicas) {
 				// start a new container to meet the requirements. The location is based on the data collected from the
 				// location-request-monitor component
+				Map<String, Coordinates> serviceWeightedMiddlePoint = requestLocationMonitoringService.getServicesWeightedMiddlePoint();
 				Coordinates coordinates = serviceWeightedMiddlePoint.get(serviceName);
 				if (coordinates == null) {
 					String containerId = topPriorityDecisionResult.getContainerId();
@@ -434,6 +434,7 @@ public class ServicesMonitoringService {
 					String decision = topPriorityDecisionResult.getDecision().name();
 					long ruleId = topPriorityDecisionResult.getRuleId();
 					Map<String, Double> fields = topPriorityDecisionResult.getFields();
+					Map<String, Coordinates> serviceWeightedMiddlePoint = requestLocationMonitoringService.getServicesWeightedMiddlePoint();
 					Coordinates coordinates = serviceWeightedMiddlePoint.get(serviceName);
 					if (coordinates == null) {
 						coordinates = containersService.getContainer(containerId).getHostAddress().getCoordinates();
@@ -453,6 +454,7 @@ public class ServicesMonitoringService {
 						String decision = topPriorityDecisionResult.getDecision().name();
 						long ruleId = topPriorityDecisionResult.getRuleId();
 						Map<String, Double> fields = topPriorityDecisionResult.getFields();
+						Map<String, Coordinates> serviceWeightedMiddlePoint = requestLocationMonitoringService.getServicesWeightedMiddlePoint();
 						Coordinates coordinates = serviceWeightedMiddlePoint.get(serviceName);
 						if (coordinates == null) {
 							coordinates = containersService.getContainer(containerId).getHostAddress().getCoordinates();
@@ -467,13 +469,15 @@ public class ServicesMonitoringService {
 					}
 				}
 				else if (topPriorityDecision == RuleDecisionEnum.STOP) {
+					ServiceDecisionResult leastPriorityContainer = containerDecisions.get(containerDecisions.size() - 1);
+					// TODO choose a better container to stop. maybe based on lifetime and/or workload
+					String containerId = leastPriorityContainer.getContainerId();
+					String decision = leastPriorityContainer.getDecision().name();
+					long ruleId = leastPriorityContainer.getRuleId();
+					HostAddress hostAddress = leastPriorityContainer.getHostAddress();
+					Map<String, Double> fields = leastPriorityContainer.getFields();
+					String result;
 					if (currentReplicas > minimumReplicas) {
-						ServiceDecisionResult leastPriorityContainer = containerDecisions.get(containerDecisions.size() - 1);
-						String containerId = leastPriorityContainer.getContainerId();
-						String decision = leastPriorityContainer.getDecision().name();
-						long ruleId = leastPriorityContainer.getRuleId();
-						HostAddress hostAddress = leastPriorityContainer.getHostAddress();
-						Map<String, Double> fields = leastPriorityContainer.getFields();
 						containersService.stopContainer(containerId);
 						if (currentReplicas == 1) {
 							for (Service databaseService : servicesService.getDependenciesByType(serviceName, ServiceTypeEnum.DATABASE)) {
@@ -493,11 +497,14 @@ public class ServicesMonitoringService {
 									.forEach(mem -> containersService.stopContainer(mem.getId()));
 							}
 						}
-						String result = String.format("Stopped container %s of service %s on host %s", containerId, serviceName, hostAddress);
-						saveServiceDecision(containerId, serviceName, decision, ruleId, fields, result);
-						servicesEventsService.reset(containerId);
-
+						result = String.format("Stopped container %s of service %s on host %s", containerId, serviceName, hostAddress);
 					}
+					else {
+						result = String.format("Executed stop decision, but minimum replicas is %d and current replicas %d", minimumReplicas, currentReplicas);
+					}
+					log.info(result);
+					saveServiceDecision(containerId, serviceName, decision, ruleId, fields, result);
+					servicesEventsService.reset(containerId);
 				}
 			}
 		}

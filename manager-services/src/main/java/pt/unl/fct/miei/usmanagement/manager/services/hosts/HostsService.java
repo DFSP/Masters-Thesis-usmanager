@@ -425,7 +425,7 @@ public class HostsService {
 		if (hostAddress == null && (closestEdgeHost != null || closestCloudHost != null)) {
 			if (closestEdgeHostDistance != null && closestCloudHostDistance != null
 				&& closestEdgeHostDistance <= closestCloudHostDistance
-				&& closestEdgeHostDistance <=  closestAwsRegionDistance * NEW_HOST_DISTANCE_FACTOR) {
+				&& closestEdgeHostDistance <= closestAwsRegionDistance * NEW_HOST_DISTANCE_FACTOR) {
 				hostAddress = closestEdgeHost.getAddress();
 				log.info("Found close edge host {}", hostAddress.toSimpleString());
 			}
