@@ -57,13 +57,13 @@ import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.schmizz.sshj.SSHClient;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
-import pt.unl.fct.miei.usmanagement.manager.loadbalancers.LoadBalancer;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.configurations.ConfigurationsService;
 import pt.unl.fct.miei.usmanagement.manager.services.regions.RegionsService;
@@ -85,6 +85,10 @@ public class AwsService {
 	private static final int BOOT_TIMEOUT = (int) TimeUnit.MINUTES.toMillis(2);
 
 	private final SshService sshService;
+	private final RegionsService regionService;
+	private final Environment environment;
+	private final ConfigurationsService configurationsService;
+
 	private final Map<AwsRegion, AmazonEC2> ec2Clients;
 	private final AWSStaticCredentialsProvider awsStaticCredentialsProvider;
 	private final String awsInstanceSecurityGroup;
@@ -94,15 +98,15 @@ public class AwsService {
 	private final int awsMaxRetries;
 	private final int awsConnectionTimeout;
 	private final String awsUsername;
-	private final RegionsService regionService;
-	private final ConfigurationsService configurationsService;
 
 	@Getter
 	private final Map<RegionEnum, Address> allocatedElasticIps;
 
-	public AwsService(SshService sshService, AwsProperties awsProperties, RegionsService regionService, ConfigurationsService configurationsService) {
+	public AwsService(SshService sshService, AwsProperties awsProperties, RegionsService regionService,
+					  Environment environment, ConfigurationsService configurationsService) {
 		this.sshService = sshService;
 		this.regionService = regionService;
+		this.environment = environment;
 		this.configurationsService = configurationsService;
 		this.ec2Clients = new HashMap<>(AwsRegion.getAvailableRegionsCount());
 		String awsAccessKey = awsProperties.getAccess().getKey();
@@ -156,6 +160,13 @@ public class AwsService {
 				return retryGetInstances(first, retry + 1, awsRegion, instances);
 			})
 			.thenCompose(Function.identity());
+	}
+
+	public List<Instance> getOwnInstances() {
+		String managerId = environment.getProperty(ContainerConstants.Environment.Manager.ID);
+		return getInstances().stream().filter(instance ->
+			instance.getTags().stream().anyMatch(tag -> Objects.equals(tag.getKey(), "ManagerId") && Objects.equals(tag.getValue(), managerId))
+		).collect(Collectors.toList());
 	}
 
 	public List<Instance> getInstances() {
@@ -246,8 +257,10 @@ public class AwsService {
 		Instance instance = result.getReservation().getInstances().get(0);
 		String instanceId = instance.getInstanceId();
 		String instanceName = String.format("ubuntu-%d", System.currentTimeMillis());
-		CreateTagsRequest createTagsRequest = new CreateTagsRequest().withResources(instanceId)
-			.withTags(new Tag("Name", instanceName), new Tag(awsInstanceTag, "true"));
+		CreateTagsRequest createTagsRequest = new CreateTagsRequest().withResources(instanceId).withTags(
+			new Tag("Name", instanceName), new Tag(awsInstanceTag, "true"),
+			new Tag("ManagerId", environment.getProperty(ContainerConstants.Environment.Manager.ID))
+		);
 		amazonEC2.createTags(createTagsRequest);
 		return instanceId;
 	}

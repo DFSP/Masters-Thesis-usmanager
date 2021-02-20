@@ -4,7 +4,7 @@ import encoding from "k6/encoding";
 
 export let options = {
     vus: 2,
-    iterations: 10,
+    iterations: 25,
 };
 
 const url = `http://${__ENV["HOST_ADDRESS"]}:8080/api/${__ENV["URL"]}`;
