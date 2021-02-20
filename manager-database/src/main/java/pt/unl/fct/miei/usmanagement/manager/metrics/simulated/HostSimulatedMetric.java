@@ -122,6 +122,7 @@ public class HostSimulatedMetric /*extends AbstractEntity<Long> */ {
 	}
 
 	public void removeAssociations() {
+		field.getSimulatedHostMetrics().remove(this);
 		Iterator<CloudHost> cloudHostsIterator = cloudHosts.iterator();
 		while (cloudHostsIterator.hasNext()) {
 			CloudHost cloudHost = cloudHostsIterator.next();

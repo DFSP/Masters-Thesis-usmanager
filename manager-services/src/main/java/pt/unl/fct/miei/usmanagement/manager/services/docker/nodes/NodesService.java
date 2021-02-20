@@ -207,7 +207,7 @@ public class NodesService {
 	}
 
 	public boolean isPartOfSwarm(HostAddress hostAddress) {
-		return dockerSwarmService.isPartOfSwarm(hostAddress);
+		return dockerSwarmService.isPartOfSwarm(hostAddress) || nodes.findByPublicIpAddress(hostAddress.getPublicIpAddress()).size() > 0;
 	}
 
 	public boolean isManager(String nodeId) {

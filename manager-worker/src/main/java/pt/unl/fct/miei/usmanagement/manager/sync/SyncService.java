@@ -49,7 +49,7 @@ public class SyncService {
 	private Timer cloudHostsDatabaseSyncTimer;
 	private Timer containersDatabaseSyncTimer;
 	private Timer nodesDatabaseSyncTimer;
-	private final String externalId;
+	private final String managerId;
 
 	public SyncService(CloudHostsService cloudHostsService, AwsService awsService, ContainersService containersService,
 					   DockerContainersService dockerContainersService,
@@ -62,7 +62,7 @@ public class SyncService {
 		this.nodesService = nodesService;
 		this.dockerSwarmService = dockerSwarmService;
 		this.configurationsService = configurationsService;
-		this.externalId = environment.getProperty(ContainerConstants.Environment.Manager.ID);
+		this.managerId = environment.getProperty(ContainerConstants.Environment.Manager.ID);
 	}
 
 	public void startCloudHostsDatabaseSynchronization() {
@@ -196,7 +196,7 @@ public class SyncService {
 				continue;
 			}
 			String managerId = container.getManagerId();
-			if (!Objects.equals(managerId, externalId)) {
+			if (!Objects.equals(managerId, this.managerId)) {
 				continue;
 			}
 			if (!dockerContainerIds.containsKey(containerId)) {
@@ -280,7 +280,7 @@ public class SyncService {
 				continue;
 			}
 			String managerId = node.getManagerId();
-			if (!Objects.equals(managerId, externalId)) {
+			if (!Objects.equals(managerId, this.managerId)) {
 				continue;
 			}
 			if (!swarmNodesIds.containsKey(nodeId)) {
