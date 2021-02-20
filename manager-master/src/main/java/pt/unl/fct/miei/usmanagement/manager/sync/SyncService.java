@@ -179,7 +179,7 @@ public class SyncService {
 		log.info("Synchronizing containers database with docker swarm");
 
 		List<Container> containers = containersService.getContainers();
-		List<DockerContainer> dockerContainers = dockerContainersService.getOwnAppContainers();
+		List<DockerContainer> dockerContainers = dockerContainersService.getContainers();
 
 		// Add missing containers
 		List<String> containerIds = containers.stream().map(Container::getId).collect(Collectors.toList());

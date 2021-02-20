@@ -52,6 +52,7 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.nodes.NodeConstants;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.registrationservers.RegistrationServer;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
@@ -87,7 +88,6 @@ public class DockerContainersService {
 
 	private final ContainersService containersService;
 	private final DockerCoreService dockerCoreService;
-	private final NodesService nodesService;
 	private final ServicesService servicesService;
 	private final ServiceDependenciesService serviceDependenciesService;
 	private final LoadBalancerService nginxLoadBalancerService;
@@ -96,27 +96,30 @@ public class DockerContainersService {
 	private final ConfigurationsService configurationsService;
 	private final RegistrationProperties registrationProperties;
 	private final Environment environment;
+	private final DockerSwarmService dockerSwarmService;
 
 	private final String managerId;
 	private final int dockerDelayBeforeStopContainer;
 	private final int threads;
 
 	public DockerContainersService(@Lazy ContainersService containersService, DockerCoreService dockerCoreService,
-								   NodesService nodesService, ServicesService servicesService,
-								   ServiceDependenciesService serviceDependenciesService, LoadBalancerService nginxLoadBalancerService,
+								   ServicesService servicesService, ServiceDependenciesService serviceDependenciesService,
+								   LoadBalancerService nginxLoadBalancerService,
 								   RegistrationServerService registrationServerService, HostsService hostsService,
-								   RegistrationProperties registrationProperties, ContainerProperties containerProperties, ConfigurationsService configurationsService,
-								   Environment environment1, ParallelismProperties parallelismProperties, Environment environment) {
+								   RegistrationProperties registrationProperties, ContainerProperties containerProperties,
+								   ConfigurationsService configurationsService,
+								   Environment environment, DockerSwarmService dockerSwarmService,
+								   ParallelismProperties parallelismProperties) {
 		this.containersService = containersService;
 		this.dockerCoreService = dockerCoreService;
-		this.nodesService = nodesService;
 		this.servicesService = servicesService;
 		this.serviceDependenciesService = serviceDependenciesService;
 		this.nginxLoadBalancerService = nginxLoadBalancerService;
 		this.registrationServerService = registrationServerService;
 		this.hostsService = hostsService;
 		this.registrationProperties = registrationProperties;
-		this.environment = environment1;
+		this.environment = environment;
+		this.dockerSwarmService = dockerSwarmService;
 		this.managerId = environment.getProperty(ContainerConstants.Environment.Manager.ID);
 		this.dockerDelayBeforeStopContainer = containerProperties.getDelayBeforeStop();
 		this.configurationsService = configurationsService;
@@ -541,7 +544,17 @@ public class DockerContainersService {
 	}
 
 	public List<DockerContainer> getContainers(DockerClient.ListContainersParam... filter) {
-		return getAllContainers(filter);
+		Gson gson = new Gson();
+		return dockerSwarmService.getReadyNodes().stream()
+			.map(node -> {
+				String publicIp = node.status().addr();
+				String privateIp = node.spec().labels().get(NodeConstants.Label.PRIVATE_IP_ADDRESS);
+				Coordinates coordinates = gson.fromJson(node.spec().labels().get(NodeConstants.Label.COORDINATES), Coordinates.class);
+				HostAddress hostAddress = new HostAddress(publicIp, privateIp, coordinates);
+				return getContainers(hostAddress, filter);
+			})
+			.flatMap(List::stream)
+			.collect(Collectors.toList());
 	}
 
 	public List<DockerContainer> getContainers(HostAddress hostAddress, DockerClient.ListContainersParam... filter) {
@@ -571,13 +584,6 @@ public class DockerContainersService {
 	private Optional<DockerContainer> findContainer(String id) {
 		DockerClient.ListContainersParam idFilter = DockerClient.ListContainersParam.filter("id", id);
 		return getContainers(idFilter).stream().findFirst();
-	}
-
-	private List<DockerContainer> getAllContainers(DockerClient.ListContainersParam... filter) {
-		return nodesService.getReadyNodes().stream()
-			.map(node -> getContainers(node.getHostAddress(), filter))
-			.flatMap(List::stream)
-			.collect(Collectors.toList());
 	}
 
 	public Optional<DockerContainer> getContainer(String id) {
@@ -695,15 +701,6 @@ public class DockerContainersService {
 		return getContainersWithLabels(Set.of(
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.SYSTEM.name()))
 		);
-	}
-
-	public List<DockerContainer> getOwnAppContainers() {
-		String managerId = environment.getProperty(ContainerConstants.Environment.Manager.ID);
-		return getContainersWithLabels(Set.of(
-			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.FRONTEND.name()),
-			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.BACKEND.name()))
-		).stream().filter(container -> Objects.equals(container.getLabels().get(ContainerConstants.Label.MANAGER_ID), managerId)
-		).collect(Collectors.toList());
 	}
 
 	public List<DockerContainer> getAppContainers() {

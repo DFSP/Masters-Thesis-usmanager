@@ -253,7 +253,7 @@ public class ServicesMonitoringService {
 	}
 
 	private void monitorServicesTask(int interval) {
-		List<DockerContainer> monitoringContainers = dockerContainersService.getOwnAppContainers();
+		List<DockerContainer> monitoringContainers = dockerContainersService.getAppContainers();
 		//List<DockerContainer> systemContainers = dockerContainersService.getSystemContainers();
 		//List<Container> synchronizedContainers = syncService.synchronizeContainersDatabase();
 
@@ -428,7 +428,24 @@ public class ServicesMonitoringService {
 			}
 			else {
 				RuleDecisionEnum topPriorityDecision = topPriorityDecisionResult.getDecision();
-				if (topPriorityDecision == RuleDecisionEnum.REPLICATE) {
+				if (topPriorityDecision == RuleDecisionEnum.MIGRATE) {
+					String containerId = topPriorityDecisionResult.getContainerId();
+					String decision = topPriorityDecisionResult.getDecision().name();
+					long ruleId = topPriorityDecisionResult.getRuleId();
+					Map<String, Double> fields = topPriorityDecisionResult.getFields();
+					Coordinates coordinates = serviceWeightedMiddlePoint.get(serviceName);
+					if (coordinates == null) {
+						coordinates = topPriorityDecisionResult.getHostAddress().getCoordinates();
+					}
+					double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(serviceName);
+					HostAddress toHostAddress = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);
+					String migratedContainerId = containersService.migrateContainer(containerId, toHostAddress).getId();
+					String result = String.format("Migrated container %s to container %s on %s", containerId,
+						migratedContainerId, toHostAddress);
+					saveServiceDecision(containerId, serviceName, decision, ruleId, fields, result);
+					servicesEventsService.reset(containerId);
+				}
+				else if (topPriorityDecision == RuleDecisionEnum.REPLICATE) {
 					if (maximumReplicas == 0 || currentReplicas < maximumReplicas) {
 						String containerId = topPriorityDecisionResult.getContainerId();
 						String decision = topPriorityDecisionResult.getDecision().name();
