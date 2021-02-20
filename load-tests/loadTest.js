@@ -13,7 +13,7 @@ export let options = {
             projectID: 3524085,
             name: 'load-tests',
             distribution: {
-                kr: {loadZone: "amazon:kr:seoul", percent: 100},
+                kr: {loadZone: "amazon:us:palo alto", percent: 100},
             }
         }
     }

@@ -253,9 +253,9 @@ public class ServicesMonitoringService {
 	}
 
 	private void monitorServicesTask(int interval) {
-		List<DockerContainer> monitoringContainers = dockerContainersService.getAppContainers();
-		List<DockerContainer> systemContainers = dockerContainersService.getSystemContainers();
-		List<Container> synchronizedContainers = syncService.synchronizeContainersDatabase();
+		List<DockerContainer> monitoringContainers = dockerContainersService.getOwnAppContainers();
+		//List<DockerContainer> systemContainers = dockerContainersService.getSystemContainers();
+		//List<Container> synchronizedContainers = syncService.synchronizeContainersDatabase();
 
 		/*containersRecoveryService.restoreCrashedContainers(monitoringContainers, synchronizedContainers);*/
 

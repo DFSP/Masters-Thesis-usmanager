@@ -70,18 +70,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.services.discovery.registra
 import pt.unl.fct.miei.usmanagement.manager.services.services.discovery.registration.RegistrationServerService;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -106,6 +95,7 @@ public class DockerContainersService {
 	private final HostsService hostsService;
 	private final ConfigurationsService configurationsService;
 	private final RegistrationProperties registrationProperties;
+	private final Environment environment;
 
 	private final String managerId;
 	private final int dockerDelayBeforeStopContainer;
@@ -116,7 +106,7 @@ public class DockerContainersService {
 								   ServiceDependenciesService serviceDependenciesService, LoadBalancerService nginxLoadBalancerService,
 								   RegistrationServerService registrationServerService, HostsService hostsService,
 								   RegistrationProperties registrationProperties, ContainerProperties containerProperties, ConfigurationsService configurationsService,
-								   ParallelismProperties parallelismProperties, Environment environment) {
+								   Environment environment1, ParallelismProperties parallelismProperties, Environment environment) {
 		this.containersService = containersService;
 		this.dockerCoreService = dockerCoreService;
 		this.nodesService = nodesService;
@@ -126,6 +116,7 @@ public class DockerContainersService {
 		this.registrationServerService = registrationServerService;
 		this.hostsService = hostsService;
 		this.registrationProperties = registrationProperties;
+		this.environment = environment1;
 		this.managerId = environment.getProperty(ContainerConstants.Environment.Manager.ID);
 		this.dockerDelayBeforeStopContainer = containerProperties.getDelayBeforeStop();
 		this.configurationsService = configurationsService;
@@ -704,6 +695,15 @@ public class DockerContainersService {
 		return getContainersWithLabels(Set.of(
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.SYSTEM.name()))
 		);
+	}
+
+	public List<DockerContainer> getOwnAppContainers() {
+		String managerId = environment.getProperty(ContainerConstants.Environment.Manager.ID);
+		return getContainersWithLabels(Set.of(
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.FRONTEND.name()),
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.BACKEND.name()))
+		).stream().filter(container -> Objects.equals(container.getLabels().get(ContainerConstants.Label.MANAGER_ID), managerId)
+		).collect(Collectors.toList());
 	}
 
 	public List<DockerContainer> getAppContainers() {

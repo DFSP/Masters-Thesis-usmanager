@@ -69,13 +69,19 @@ public class HeartbeatService {
 		List<Container> containers = containersService.getManagerContainers(managerId).stream()
 			.filter(container -> container.getState().equalsIgnoreCase("down"))
 			.collect(Collectors.toList());
-		containers.forEach(container -> container.setState("ready"));
-		containersService.saveContainers(containers);
+		if (containers.size() > 0) {
+			log.info("Setting worker manager containers to ready state");
+			containers.forEach(container -> container.setState("ready"));
+			containersService.saveContainers(containers);
+		}
 		List<Node> nodes = nodesService.getManagerNodes(managerId).stream()
 			.filter(node -> node.getState().equalsIgnoreCase("down"))
 			.collect(Collectors.toList());
-		nodes.forEach(node -> node.setState("ready"));
-		nodesService.saveNodes(nodes);
+		if (nodes.size() > 0) {
+			log.info("Setting worker manager nodes to ready state");
+			nodes.forEach(node -> node.setState("ready"));
+			nodesService.saveNodes(nodes);
+		}
 		return heartbeats.save(heartbeat);
 	}
 

@@ -253,7 +253,7 @@ public class ServicesMonitoringService {
 	}
 
 	private void monitorServicesTask(int interval) {
-		List<DockerContainer> monitoringContainers = dockerContainersService.getAppContainers();
+		List<DockerContainer> monitoringContainers = dockerContainersService.getOwnAppContainers();
 
 		Map<String, List<ServiceDecisionResult>> containersDecisions = new HashMap<>();
 
