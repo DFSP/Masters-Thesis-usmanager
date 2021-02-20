@@ -90,7 +90,7 @@ public class SyncService {
 	public List<CloudHost> synchronizeCloudHostsDatabase() {
 		log.info("Synchronizing cloud hosts data with amazon");
 		List<CloudHost> cloudHosts = cloudHostsService.getCloudHostsAndRelations();
-		List<Instance> awsInstances = awsService.getOwnInstances();
+		List<Instance> awsInstances = awsService.getInstances();
 		Map<String, Instance> awsInstancesIds = awsInstances.stream()
 			.collect(Collectors.toMap(Instance::getInstanceId, instance -> instance));
 		Iterator<CloudHost> cloudHostsIterator = cloudHosts.iterator();
