@@ -27,7 +27,10 @@ package pt.unl.fct.miei.usmanagement.manager.services.location;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -99,7 +102,12 @@ public class LocationRequestsService {
 					locationWeights = new ArrayList<>(1);
 				}
 				for (LocationRequest locationRequest : nodeRequest) {
-					Coordinates coordinates = new Coordinates(locationRequest.getLatitude(), locationRequest.getLongitude());
+					double latitude = locationRequest.getLatitude();
+					double longitude = locationRequest.getLongitude();
+					if (latitude == 0 || longitude == 0) {
+						continue;
+					}
+					Coordinates coordinates = new Coordinates(latitude, longitude);
 					int count = locationRequest.getCount();
 					LocationWeight locationWeight = new LocationWeight(coordinates, count);
 					locationWeights.add(locationWeight);
@@ -211,7 +219,9 @@ public class LocationRequestsService {
 
 		Map<String, List<LocationRequest>> locationMonitoringData = new HashMap<>();
 		try {
-			locationMonitoringData = restTemplate.getForObject(url, Map.class);
+			ParameterizedTypeReference<Map<String, List<LocationRequest>>> typeRef = new ParameterizedTypeReference<>() { };
+			ResponseEntity<Map<String, List<LocationRequest>>> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef);
+			locationMonitoringData = responseEntity.getBody();
 			log.info("Got reply from {}: {}", url, locationMonitoringData);
 		}
 		catch (RestClientException e) {
