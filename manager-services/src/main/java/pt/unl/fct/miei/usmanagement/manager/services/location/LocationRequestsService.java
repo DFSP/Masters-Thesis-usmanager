@@ -28,7 +28,6 @@ import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -43,6 +42,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 
 import java.util.*;
@@ -56,6 +56,8 @@ public class LocationRequestsService {
 	private final NodesService nodesService;
 	private final HostsService hostsService;
 	private final ContainersService containersService;
+	private final DockerSwarmService dockerSwarmService;
+	private final Environment environment;
 
 	private final String managerId;
 	private final int port;
@@ -64,12 +66,14 @@ public class LocationRequestsService {
 	private final Map<String, Long> lastRequestTime;
 
 	public LocationRequestsService(NodesService nodesService, @Lazy HostsService hostsService,
-								   @Lazy ContainersService containersService, DockerProperties dockerProperties,
+								   @Lazy ContainersService containersService, DockerSwarmService dockerSwarmService, DockerProperties dockerProperties,
 								   LocationRequestsProperties locationRequestsProperties, RequestLocationRequestInterceptor requestInterceptor,
 								   Environment environment) {
 		this.nodesService = nodesService;
 		this.hostsService = hostsService;
 		this.containersService = containersService;
+		this.dockerSwarmService = dockerSwarmService;
+		this.environment = environment;
 		this.dockerHubUsername = dockerProperties.getHub().getUsername();
 		this.managerId = environment.getProperty(ContainerConstants.Environment.Manager.ID);
 		this.port = locationRequestsProperties.getPort();
@@ -110,9 +114,8 @@ public class LocationRequestsService {
 		double x = 0, y = 0, z = 0;
 
 		for (LocationWeight locationWeight : locationWeights) {
-			Node node = locationWeight.getNode();
+			Coordinates coordinates = locationWeight.getCoordinates();
 			int weight = locationWeight.getWeight();
-			Coordinates coordinates = node.getCoordinates();
 			double latitude = coordinates.getLatitude();
 			double longitude = coordinates.getLongitude();
 
@@ -158,7 +161,9 @@ public class LocationRequestsService {
 	public Map<Node, Map<String, Integer>> getNodesLocationRequests(Long interval, boolean manualRequest) {
 		Map<Node, Map<String, Integer>> nodeLocationRequests = new HashMap<>();
 
-		List<Node> nodes = nodesService.getReadyNodes();
+		List<Node> nodes = Objects.equals(environment.getProperty(ContainerConstants.Environment.Manager.ID), ServiceConstants.Name.MASTER_MANAGER)
+			? nodesService.getReadyNodes()
+			: dockerSwarmService.getReadyNodes().stream().map(nodesService::fromSwarmNode).collect(Collectors.toList());
 
 		List<CompletableFuture<?>> requests = new ArrayList<>();
 		for (Node node : nodes) {

@@ -27,6 +27,7 @@ package api
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"github.com/usmanager/manager/request-location-monitor/reglog"
 	"net/http"
 	"strconv"
@@ -101,7 +102,14 @@ func listMonitoringAggregation(w http.ResponseWriter, r *http.Request) {
 			if hasService {
 				count += serviceCount
 			}
-			serviceLocationMonitoring[serviceName] = count
+
+			serviceLocationRequest := data.ServiceLocationRequest{
+				Count:       count,
+				Latitude:    monitoringData.Latitude,
+				Longitude:   monitoringData.Longitude,
+			}
+
+			serviceLocationMonitoring[serviceName] = serviceLocationRequest
 		}
 	}
 
@@ -115,6 +123,8 @@ func AddLocationRequest(w http.ResponseWriter, r *http.Request) {
 	monitoringData := data.LocationRequest{
 		Service:   requestMonitoringData.Service,
 		Count:     requestMonitoringData.Count,
+		Latitude:  requestMonitoringData.Latitude,
+		Longitude: requestMonitoringData.Longitude,
 		Timestamp: time.Now(),
 	}
 	monitoringDataJson, _ := json.Marshal(monitoringData)

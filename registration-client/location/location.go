@@ -47,6 +47,8 @@ func RegisterRequest(service string) {
 	locationRequest := data.LocationRequest{
 		Service: service,
 		Count:   1,
+		Latitude: instance.Latitude,
+		Longitude: instance.Longitude,
 	}
 	AddRequest(locationRequest)
 }
@@ -62,6 +64,8 @@ func AddRequest(locationRequest data.LocationRequest) {
 	newServiceRequests := data.LocationRequest{
 		Service: locationRequest.Service,
 		Count:   count,
+		Latitude: locationRequest.Latitude,
+		Longitude: locationRequest.Longitude,
 	}
 	locationRequests.Set(locationRequest.Service, newServiceRequests)
 }

@@ -304,7 +304,7 @@ public class NodesService {
 		}
 	}
 
-	private pt.unl.fct.miei.usmanagement.manager.nodes.Node fromSwarmNode(Node node) {
+	public pt.unl.fct.miei.usmanagement.manager.nodes.Node fromSwarmNode(Node node) {
 		com.spotify.docker.client.messages.swarm.ManagerStatus status = node.managerStatus();
 		return pt.unl.fct.miei.usmanagement.manager.nodes.Node.builder()
 			.id(node.id())

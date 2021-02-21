@@ -69,11 +69,11 @@ public class Main {
 			double previousTxBytes = Double.MAX_VALUE;
 			@Override
 			public void run() {
-				long currentTime = System.currentTimeMillis();
-				int interval = (int) (currentTime - previousTime);
-				previousTime = currentTime;
 				try {
-					Map<String, Double> stats = getContainerStats(dockerClient, containerId, cpuCores, interval);
+					Map<String, Double> stats = getContainerStats(dockerClient, containerId, cpuCores);
+					long currentTime = System.currentTimeMillis();
+					int interval = (int) (currentTime - previousTime);
+					previousTime = currentTime;
 					double currentRxBytes = stats.get("rx-bytes");
 					double rxBytesPerSec = Math.max(0, (currentRxBytes - previousRxBytes) / TimeUnit.MILLISECONDS.toSeconds(interval));
 					stats.put("rx-bytes-per-sec", rxBytesPerSec);
@@ -113,7 +113,7 @@ public class Main {
 		return formatter.format(date);
 	}
 
-	private static Map<String, Double> getContainerStats(DockerClient dockerClient, String containerId, int cpuCores, long interval)
+	private static Map<String, Double> getContainerStats(DockerClient dockerClient, String containerId, int cpuCores)
 		throws DockerException, InterruptedException {
 		Map<String, Double> stats = new HashMap<>();
 		ContainerStats containerStats = dockerClient.stats(containerId);
