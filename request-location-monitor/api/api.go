@@ -117,29 +117,32 @@ func listMonitoringAggregation(w http.ResponseWriter, r *http.Request) {
 }
 
 func AddLocationRequest(w http.ResponseWriter, r *http.Request) {
-	var requestMonitoringData data.LocationRequest
+	var requestMonitoringData []data.LocationRequest
 	_ = json.NewDecoder(r.Body).Decode(&requestMonitoringData)
-	monitoringData := data.LocationRequest{
-		Service:   requestMonitoringData.Service,
-		Count:     requestMonitoringData.Count,
-		Latitude:  requestMonitoringData.Latitude,
-		Longitude: requestMonitoringData.Longitude,
-		Timestamp: time.Now(),
-	}
-	monitoringDataJson, _ := json.Marshal(monitoringData)
-	service := monitoringData.Service
 
-	lock.Lock()
-	defer lock.Unlock()
-	serviceMonitoringDataSlice, ok := data.LocationMonitoringData.Get(service)
-	if ok {
-		serviceMonitoringDataSlice.(*utils.ConcurrentSlice).Append(monitoringData)
-		data.LocationMonitoringData.Set(service, serviceMonitoringDataSlice)
-		reglog.Logger.Infof("Added location request to existing service: %s = %s", service, string(monitoringDataJson))
-	} else {
-		serviceMonitoringDataSlice := utils.NewConcurrentSlice()
-		serviceMonitoringDataSlice.Append(monitoringData)
-		data.LocationMonitoringData.Set(service, serviceMonitoringDataSlice)
-		reglog.Logger.Infof("Added location request to new service: %s = %s", service, string(monitoringDataJson))
+	for _, requestMonitoring := range requestMonitoringData {
+		monitoringData := data.LocationRequest{
+			Service:   requestMonitoring.Service,
+			Count:     requestMonitoring.Count,
+			Latitude:  requestMonitoring.Latitude,
+			Longitude: requestMonitoring.Longitude,
+			Timestamp: time.Now(),
+		}
+		monitoringDataJson, _ := json.Marshal(monitoringData)
+		service := monitoringData.Service
+
+		lock.Lock()
+		defer lock.Unlock()
+		serviceMonitoringDataSlice, ok := data.LocationMonitoringData.Get(service)
+		if ok {
+			serviceMonitoringDataSlice.(*utils.ConcurrentSlice).Append(monitoringData)
+			data.LocationMonitoringData.Set(service, serviceMonitoringDataSlice)
+			reglog.Logger.Infof("Added location request to existing service: %s = %s", service, string(monitoringDataJson))
+		} else {
+			serviceMonitoringDataSlice := utils.NewConcurrentSlice()
+			serviceMonitoringDataSlice.Append(monitoringData)
+			data.LocationMonitoringData.Set(service, serviceMonitoringDataSlice)
+			reglog.Logger.Infof("Added location request to new service: %s = %s", service, string(monitoringDataJson))
+		}
 	}
 }

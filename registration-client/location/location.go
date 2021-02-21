@@ -60,22 +60,27 @@ func AddRequest(locationRequest data.LocationRequest) {
 	count := 1
 	if hasRequests && serviceRequests != nil {
 		requests := serviceRequests.([]data.LocationRequest)
+		index := -1
 		for i := range requests {
 			if requests[i].Latitude == locationRequest.Latitude && requests[i].Longitude == locationRequest.Longitude {
 				count += requests[i].Count
+				index = i
+				break
 			}
-			newServiceRequest := data.LocationRequest{
-				Service: locationRequest.Service,
-				Count:   count,
-				Latitude: locationRequest.Latitude,
-				Longitude: locationRequest.Longitude,
-			}
-			requests = append(requests, newServiceRequest)
-			requests = append(requests[:i+1], requests[i:]...)
-			requests[i] = newServiceRequest
-			locationRequests.Set(locationRequest.Service, requests)
-			break
 		}
+		newServiceRequest := data.LocationRequest{
+			Service: locationRequest.Service,
+			Count:   count,
+			Latitude: locationRequest.Latitude,
+			Longitude: locationRequest.Longitude,
+		}
+		//requests = append(requests[:i+1], requests[i:]...)
+		if index != -1 {
+			requests[index] = newServiceRequest
+		} else {
+			requests = append(requests, newServiceRequest)
+		}
+		locationRequests.Set(locationRequest.Service, requests)
 	} else {
 		var newServiceRequests []data.LocationRequest
 		request := data.LocationRequest{
