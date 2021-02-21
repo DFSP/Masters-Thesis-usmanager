@@ -34,7 +34,6 @@ import (
 	"time"
 
 	"github.com/usmanager/manager/request-location-monitor/data"
-	"github.com/usmanager/manager/request-location-monitor/utils"
 )
 
 var interval int
@@ -60,11 +59,8 @@ func listMonitoring(w http.ResponseWriter) {
 	locationMonitoring := []data.LocationRequest{}
 
 	for mapItem := range data.LocationMonitoringData.Iter() {
-		serviceData := mapItem.Value.(*utils.ConcurrentSlice)
-		for sliceItem := range serviceData.Iter() {
-			monitoringData := sliceItem.Value.(data.LocationRequest)
-			locationMonitoring = append(locationMonitoring, monitoringData)
-		}
+		list := mapItem.Value.([]data.LocationRequest)
+		locationMonitoring = append(locationMonitoring, list...)
 	}
 
 	reglog.Logger.Infof("Replying locationMonitoring with: %+v", locationMonitoring)
@@ -86,29 +82,49 @@ func listMonitoringAggregation(w http.ResponseWriter, r *http.Request) {
 	maxTime := time.Now()
 	minTime := maxTime.Add(time.Duration(-aggregationInterval) * time.Millisecond)
 
-	serviceLocationMonitoring := make(map[string]data.ServiceLocationRequest)
+	serviceLocationMonitoring := make(map[string][]data.ServiceLocationRequest)
 
 	for mapItem := range data.LocationMonitoringData.Iter() {
 		serviceName := mapItem.Key
-		serviceData := mapItem.Value.(*utils.ConcurrentSlice)
-		for sliceItem := range serviceData.Iter() {
-			monitoringData := sliceItem.Value.(data.LocationRequest)
+		monitoringDataList := mapItem.Value.([]data.LocationRequest)
+		for _, monitoringData := range monitoringDataList {
 			if monitoringData.Timestamp.Before(minTime) || monitoringData.Timestamp.After(maxTime) {
 				continue
 			}
 			count := monitoringData.Count
-			serviceData, hasService := serviceLocationMonitoring[serviceName]
-			if hasService {
-				count += serviceData.Count
-			}
+			serviceData, hasServices := serviceLocationMonitoring[serviceName]
 
-			serviceLocationRequest := data.ServiceLocationRequest{
-				Count:       count,
-				Latitude:    monitoringData.Latitude,
-				Longitude:   monitoringData.Longitude,
+			if hasServices {
+				index := -1
+				for i := range serviceData {
+					if serviceData[i].Latitude == monitoringData.Latitude && serviceData[i].Longitude == monitoringData.Longitude {
+						count += serviceData[i].Count
+						index = i
+						break
+					}
+				}
+				newServiceRequest := data.ServiceLocationRequest{
+					Count:       count,
+					Latitude:    monitoringData.Latitude,
+					Longitude:   monitoringData.Longitude,
+				}
+				//requests = append(requests[:i+1], requests[i:]...)
+				if index != -1 {
+					serviceData[index] = newServiceRequest
+				} else {
+					serviceData = append(serviceData, newServiceRequest)
+				}
+				serviceLocationMonitoring[serviceName] = serviceData
+			} else {
+				var newServiceRequests []data.ServiceLocationRequest
+				request := data.ServiceLocationRequest{
+					Count:       count,
+					Latitude:    monitoringData.Latitude,
+					Longitude:   monitoringData.Longitude,
+				}
+				newServiceRequests = append(newServiceRequests, request)
+				serviceLocationMonitoring[serviceName] = newServiceRequests
 			}
-
-			serviceLocationMonitoring[serviceName] = serviceLocationRequest
 		}
 	}
 
@@ -135,14 +151,18 @@ func AddLocationRequest(w http.ResponseWriter, r *http.Request) {
 		defer lock.Unlock()
 		serviceMonitoringDataSlice, ok := data.LocationMonitoringData.Get(service)
 		if ok {
-			serviceMonitoringDataSlice.(*utils.ConcurrentSlice).Append(monitoringData)
-			data.LocationMonitoringData.Set(service, serviceMonitoringDataSlice)
+			serviceMonitoring := serviceMonitoringDataSlice.([]data.LocationRequest)
+			serviceMonitoring = append(serviceMonitoring, monitoringData)
+			data.LocationMonitoringData.Set(service, serviceMonitoring)
 			reglog.Logger.Infof("Added location request to existing service: %s = %s", service, string(monitoringDataJson))
 		} else {
-			serviceMonitoringDataSlice := utils.NewConcurrentSlice()
-			serviceMonitoringDataSlice.Append(monitoringData)
-			data.LocationMonitoringData.Set(service, serviceMonitoringDataSlice)
+			var newServiceMonitoring []data.LocationRequest
+			newServiceMonitoring = append(newServiceMonitoring, monitoringData)
+			data.LocationMonitoringData.Set(service, newServiceMonitoring)
+
+
 			reglog.Logger.Infof("Added location request to new service: %s = %s", service, string(monitoringDataJson))
 		}
+		reglog.Logger.Infof("%+v", data.LocationMonitoringData)
 	}
 }

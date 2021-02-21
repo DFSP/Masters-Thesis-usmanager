@@ -88,20 +88,22 @@ public class LocationRequestsService {
 	}
 
 	public Map<String, List<LocationWeight>> getLocationsWeight() {
-		Map<Node, Map<String, LocationRequest>> nodeLocationRequests = getNodesLocationRequests();
+		Map<Node, Map<String, List<LocationRequest>>> nodeLocationRequests = getNodesLocationRequests();
 
 		Map<String, List<LocationWeight>> servicesLocationsWeights = new HashMap<>();
-		for (Map.Entry<Node, Map<String, LocationRequest>> requests : nodeLocationRequests.entrySet()) {
-			Node node = requests.getKey();
-			requests.getValue().forEach((service, request) -> {
+		for (Map.Entry<Node, Map<String, List<LocationRequest>>> nodesRequests : nodeLocationRequests.entrySet()) {
+			//Node node = nodesRequests.getKey();
+			nodesRequests.getValue().forEach((service, nodeRequest) -> {
 				List<LocationWeight> locationWeights = servicesLocationsWeights.get(service);
 				if (locationWeights == null) {
 					locationWeights = new ArrayList<>(1);
 				}
-				Coordinates coordinates = new Coordinates(request.getLatitude(), request.getLongitude());
-				int count = request.getCount();
-				LocationWeight locationWeight = new LocationWeight(coordinates, count);
-				locationWeights.add(locationWeight);
+				for (LocationRequest locationRequest : nodeRequest) {
+					Coordinates coordinates = new Coordinates(locationRequest.getLatitude(), locationRequest.getLongitude());
+					int count = locationRequest.getCount();
+					LocationWeight locationWeight = new LocationWeight(coordinates, count);
+					locationWeights.add(locationWeight);
+				}
 				servicesLocationsWeights.put(service, locationWeights);
 			});
 		}
@@ -156,12 +158,12 @@ public class LocationRequestsService {
 		return coordinates;
 	}
 
-	public Map<Node, Map<String, LocationRequest>> getNodesLocationRequests() {
+	public Map<Node, Map<String, List<LocationRequest>>> getNodesLocationRequests() {
 		return getNodesLocationRequests(null, false);
 	}
 
-	public Map<Node, Map<String, LocationRequest>> getNodesLocationRequests(Long interval, boolean manualRequest) {
-		Map<Node, Map<String, LocationRequest>> nodeLocationRequests = new HashMap<>();
+	public Map<Node, Map<String, List<LocationRequest>>> getNodesLocationRequests(Long interval, boolean manualRequest) {
+		Map<Node, Map<String, List<LocationRequest>>> nodeLocationRequests = new HashMap<>();
 
 		List<Node> nodes = Objects.equals(environment.getProperty(ContainerConstants.Environment.Manager.ID), ServiceConstants.Name.MASTER_MANAGER)
 			? nodesService.getReadyNodes()
@@ -188,7 +190,7 @@ public class LocationRequestsService {
 		return nodeLocationRequests;
 	}
 
-	public Map<String, LocationRequest> getNodeLocationRequests(String hostname, int port, Long interval, boolean manualRequest) {
+	public Map<String, List<LocationRequest>> getNodeLocationRequests(String hostname, int port, Long interval, boolean manualRequest) {
 		String url = String.format("http://%s:%s/api/location/requests?aggregation", hostname, port);
 		long currentRequestTime = System.currentTimeMillis();
 		if (interval != null) {
@@ -207,7 +209,7 @@ public class LocationRequestsService {
 
 		log.info("Requesting location requests from {}", url);
 
-		Map<String, LocationRequest> locationMonitoringData = new HashMap<>();
+		Map<String, List<LocationRequest>> locationMonitoringData = new HashMap<>();
 		try {
 			locationMonitoringData = restTemplate.getForObject(url, Map.class);
 			log.info("Got reply from {}: {}", url, locationMonitoringData);

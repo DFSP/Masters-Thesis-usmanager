@@ -21,7 +21,7 @@ public class RequestLocationsController {
 	}
 
 	@GetMapping("/locations")
-	public Map<Node, Map<String, LocationRequest>> getLocationRequests(@RequestParam(required = false) Long interval) {
+	public Map<Node, Map<String, List<LocationRequest>>> getLocationRequests(@RequestParam(required = false) Long interval) {
 		return locationRequestsService.getNodesLocationRequests(interval, true);
 	}
 
