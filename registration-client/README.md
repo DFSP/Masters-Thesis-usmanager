@@ -103,7 +103,7 @@ Adiciona manualmente uma nova monitorização, que é adicionada aos dados já e
 ```shell script
 curl -i \
      --header "Content-Type: application/json" \
-     --data '{"service":"app","latitude":"39.575097","longitude":"-8.909794","count":"1"}' \
+     --data '{"service":"app","latitude":39.575097,"longitude":-8.909794,"count":1}' \
      http://localhost:1906/api/metrics
 ```
 

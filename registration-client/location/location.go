@@ -64,15 +64,30 @@ func AddRequest(locationRequest data.LocationRequest) {
 			if requests[i].Latitude == locationRequest.Latitude && requests[i].Longitude == locationRequest.Longitude {
 				count += requests[i].Count
 			}
+			newServiceRequest := data.LocationRequest{
+				Service: locationRequest.Service,
+				Count:   count,
+				Latitude: locationRequest.Latitude,
+				Longitude: locationRequest.Longitude,
+			}
+			requests = append(requests, newServiceRequest)
+			requests = append(requests[:i+1], requests[i:]...)
+			requests[i] = newServiceRequest
+			locationRequests.Set(locationRequest.Service, requests)
+			break
 		}
+	} else {
+		var newServiceRequests []data.LocationRequest
+		request := data.LocationRequest{
+			Service: locationRequest.Service,
+			Count:   count,
+			Latitude: locationRequest.Latitude,
+			Longitude: locationRequest.Longitude,
+		}
+		newServiceRequests = append(newServiceRequests, request)
+		locationRequests.Set(locationRequest.Service, newServiceRequests)
 	}
-	newServiceRequests := data.LocationRequest{
-		Service: locationRequest.Service,
-		Count:   count,
-		Latitude: locationRequest.Latitude,
-		Longitude: locationRequest.Longitude,
-	}
-	locationRequests.Set(locationRequest.Service, newServiceRequests)
+
 }
 
 func clear(serviceKey string) {
@@ -107,8 +122,8 @@ func sendRequestsData() {
 		serviceKey := mapItem.Key
 		value := mapItem.Value
 		if value != nil {
-			serviceRequests := value.(data.LocationRequest)
-			if serviceRequests.Count > 0 {
+			serviceRequests := value.([]data.LocationRequest)
+			if len(serviceRequests) > 0 {
 				go sendData(serviceRequests)
 				go clear(serviceKey)
 			}
@@ -116,7 +131,7 @@ func sendRequestsData() {
 	}
 }
 
-func sendData(data data.LocationRequest) {
+func sendData(data []data.LocationRequest) {
 	jsonValue, _ := json.Marshal(data)
 	req, err := http.NewRequest("POST", instance.RequestLocationMonitorUrl, bytes.NewBuffer(jsonValue))
 	if err == nil {
