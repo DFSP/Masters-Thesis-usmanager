@@ -27,6 +27,7 @@ package location
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/usmanager/manager/registration-client/data"
 	"github.com/usmanager/manager/registration-client/instance"
 	"net/http"
@@ -47,8 +48,8 @@ func RegisterRequest(service string) {
 	locationRequest := data.LocationRequest{
 		Service: service,
 		Count:   1,
-		Latitude: instance.Latitude,
-		Longitude: instance.Longitude,
+		Latitude: fmt.Sprintf("%f", instance.Latitude),
+		Longitude: fmt.Sprintf("%f", instance.Longitude),
 	}
 	AddRequest(locationRequest)
 }
