@@ -104,6 +104,8 @@ public class LocationRequestsService {
 			});
 		}
 
+		//Map<Coordinates, Map<String, Integer>> coordinatesRequests = getCoordinatesRequests();
+
 		log.info("Location weights: {}", servicesLocationsWeights);
 		return servicesLocationsWeights;
 	}
@@ -114,8 +116,9 @@ public class LocationRequestsService {
 		double x = 0, y = 0, z = 0;
 
 		for (LocationWeight locationWeight : locationWeights) {
-			Coordinates coordinates = locationWeight.getCoordinates();
+			Node node = locationWeight.getNode();
 			int weight = locationWeight.getWeight();
+			Coordinates coordinates = node.getCoordinates();
 			double latitude = coordinates.getLatitude();
 			double longitude = coordinates.getLongitude();
 

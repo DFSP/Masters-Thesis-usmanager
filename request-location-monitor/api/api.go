@@ -27,7 +27,6 @@ package api
 import (
 	"encoding/json"
 	"flag"
-	"fmt"
 	"github.com/usmanager/manager/request-location-monitor/reglog"
 	"net/http"
 	"strconv"
@@ -87,7 +86,7 @@ func listMonitoringAggregation(w http.ResponseWriter, r *http.Request) {
 	maxTime := time.Now()
 	minTime := maxTime.Add(time.Duration(-aggregationInterval) * time.Millisecond)
 
-	serviceLocationMonitoring := make(map[string]int)
+	serviceLocationMonitoring := make(map[string]data.ServiceLocationRequest)
 
 	for mapItem := range data.LocationMonitoringData.Iter() {
 		serviceName := mapItem.Key
@@ -98,9 +97,9 @@ func listMonitoringAggregation(w http.ResponseWriter, r *http.Request) {
 				continue
 			}
 			count := monitoringData.Count
-			serviceCount, hasService := serviceLocationMonitoring[serviceName]
+			serviceData, hasService := serviceLocationMonitoring[serviceName]
 			if hasService {
-				count += serviceCount
+				count += serviceData.Count
 			}
 
 			serviceLocationRequest := data.ServiceLocationRequest{

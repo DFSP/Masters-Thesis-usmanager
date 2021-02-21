@@ -25,13 +25,12 @@
 package pt.unl.fct.miei.usmanagement.manager.services.location;
 
 import lombok.Data;
-import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 
 @Data
 public final class LocationWeight {
 
-	private final Coordinates coordinates;
+	private final Node node;
 	private final int weight;
 
 }
