@@ -97,6 +97,7 @@ public class DockerContainersService {
 	private final RegistrationProperties registrationProperties;
 	private final Environment environment;
 	private final DockerSwarmService dockerSwarmService;
+	private final NodesService nodesService;
 
 	private final String managerId;
 	private final int dockerDelayBeforeStopContainer;
@@ -109,7 +110,7 @@ public class DockerContainersService {
 								   RegistrationProperties registrationProperties, ContainerProperties containerProperties,
 								   ConfigurationsService configurationsService,
 								   Environment environment, DockerSwarmService dockerSwarmService,
-								   ParallelismProperties parallelismProperties) {
+								   NodesService nodesService, ParallelismProperties parallelismProperties) {
 		this.containersService = containersService;
 		this.dockerCoreService = dockerCoreService;
 		this.servicesService = servicesService;
@@ -123,6 +124,7 @@ public class DockerContainersService {
 		this.managerId = environment.getProperty(ContainerConstants.Environment.Manager.ID);
 		this.dockerDelayBeforeStopContainer = containerProperties.getDelayBeforeStop();
 		this.configurationsService = configurationsService;
+		this.nodesService = nodesService;
 		this.threads = parallelismProperties.getThreads();
 	}
 
@@ -541,6 +543,16 @@ public class DockerContainersService {
 			}
 		}, dockerDelayBeforeStopContainer);
 		return replicaContainer;
+	}
+
+	public List<DockerContainer> getAllContainers(DockerClient.ListContainersParam... filter) {
+		return nodesService.getReadyNodes().stream()
+			.map(node -> {
+				HostAddress hostAddress = node.getHostAddress();
+				return getContainers(hostAddress, filter);
+			})
+			.flatMap(List::stream)
+			.collect(Collectors.toList());
 	}
 
 	public List<DockerContainer> getContainers(DockerClient.ListContainersParam... filter) {

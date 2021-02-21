@@ -390,7 +390,6 @@ public class ServicesMonitoringService {
 	}
 
 	private void executeDecisions(Map<String, List<ServiceDecisionResult>> decisions, Map<String, Integer> replicasCount) {
-		Map<String, Coordinates> serviceWeightedMiddlePoint = requestLocationMonitoringService.getServicesWeightedMiddlePoint();
 		for (Entry<String, List<ServiceDecisionResult>> servicesDecisions : decisions.entrySet()) {
 			String serviceName = servicesDecisions.getKey();
 			List<ServiceDecisionResult> containerDecisions = servicesDecisions.getValue();
@@ -402,6 +401,7 @@ public class ServicesMonitoringService {
 			if (currentReplicas < minimumReplicas) {
 				// start a new container to meet the requirements. The location is based on the data collected from the
 				// location-request-monitor component
+				Map<String, Coordinates> serviceWeightedMiddlePoint = requestLocationMonitoringService.getServicesWeightedMiddlePoint();
 				Coordinates coordinates = serviceWeightedMiddlePoint.get(serviceName);
 				if (coordinates == null) {
 					String containerId = topPriorityDecisionResult.getContainerId();
@@ -420,6 +420,7 @@ public class ServicesMonitoringService {
 					String decision = topPriorityDecisionResult.getDecision().name();
 					long ruleId = topPriorityDecisionResult.getRuleId();
 					Map<String, Double> fields = topPriorityDecisionResult.getFields();
+					Map<String, Coordinates> serviceWeightedMiddlePoint = requestLocationMonitoringService.getServicesWeightedMiddlePoint();
 					Coordinates coordinates = serviceWeightedMiddlePoint.get(serviceName);
 					if (coordinates == null) {
 						coordinates = containersService.getContainer(containerId).getHostAddress().getCoordinates();
@@ -439,6 +440,7 @@ public class ServicesMonitoringService {
 						String decision = topPriorityDecisionResult.getDecision().name();
 						long ruleId = topPriorityDecisionResult.getRuleId();
 						Map<String, Double> fields = topPriorityDecisionResult.getFields();
+						Map<String, Coordinates> serviceWeightedMiddlePoint = requestLocationMonitoringService.getServicesWeightedMiddlePoint();
 						Coordinates coordinates = serviceWeightedMiddlePoint.get(serviceName);
 						if (coordinates == null) {
 							coordinates = containersService.getContainer(containerId).getHostAddress().getCoordinates();

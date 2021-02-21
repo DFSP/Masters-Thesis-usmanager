@@ -115,7 +115,7 @@ func sendData(data data.LocationRequest) {
 		client := &http.Client{}
 		resp, err := client.Do(req)
 		if err != nil {
-			reglog.Logger.Infof("Failed to send location data %+v to %s", data, req.RequestURI)
+			reglog.Logger.Infof("Failed to send location data %+v to request-monitor", data)
 		} else {
 			defer resp.Body.Close()
 			reglog.Logger.Infof("Sent location data %s", jsonValue)
