@@ -86,12 +86,20 @@ public class LocationRequestsService {
 	}
 
 	public Map<String, Coordinates> getServicesWeightedMiddlePoint() {
-		return getLocationsWeight().entrySet().stream()
+		return getServicesWeightedMiddlePoint(0L, false);
+	}
+
+	public Map<String, Coordinates> getServicesWeightedMiddlePoint(Long interval, boolean manual) {
+		return getLocationsWeight(interval, manual).entrySet().stream()
 			.collect(Collectors.toMap(Map.Entry::getKey, e -> getServiceWeightedMiddlePoint(e.getValue())));
 	}
 
 	public Map<String, List<LocationWeight>> getLocationsWeight() {
-		Map<Node, Map<String, List<LocationRequest>>> nodeLocationRequests = getNodesLocationRequests();
+		return getLocationsWeight(0L, false);
+	}
+
+	public Map<String, List<LocationWeight>> getLocationsWeight(Long interval, boolean manual) {
+		Map<Node, Map<String, List<LocationRequest>>> nodeLocationRequests = getNodesLocationRequests(interval, manual);
 
 		Map<String, List<LocationWeight>> servicesLocationsWeights = new HashMap<>();
 		for (Map.Entry<Node, Map<String, List<LocationRequest>>> nodesRequests : nodeLocationRequests.entrySet()) {
@@ -219,7 +227,8 @@ public class LocationRequestsService {
 
 		Map<String, List<LocationRequest>> locationMonitoringData = new HashMap<>();
 		try {
-			ParameterizedTypeReference<Map<String, List<LocationRequest>>> typeRef = new ParameterizedTypeReference<>() { };
+			ParameterizedTypeReference<Map<String, List<LocationRequest>>> typeRef = new ParameterizedTypeReference<>() {
+			};
 			ResponseEntity<Map<String, List<LocationRequest>>> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef);
 			locationMonitoringData = responseEntity.getBody();
 			log.info("Got reply from {}: {}", url, locationMonitoringData);

@@ -26,13 +26,13 @@ public class RequestLocationsController {
 	}
 
 	@GetMapping("/locations/weight")
-	public Map<String, List<LocationWeight>> getLocationsWeight() {
-		return locationRequestsService.getLocationsWeight();
+	public Map<String, List<LocationWeight>> getLocationsWeight(@RequestParam(required = false) Long interval) {
+		return locationRequestsService.getLocationsWeight(interval, true);
 	}
 
 	@GetMapping("/services/middle-point")
-	public Map<String, Coordinates> getServicesWeightedMiddlePoint() {
-		return locationRequestsService.getServicesWeightedMiddlePoint();
+	public Map<String, Coordinates> getServicesWeightedMiddlePoint(@RequestParam(required = false) Long interval) {
+		return locationRequestsService.getServicesWeightedMiddlePoint(interval, true);
 	}
 
 }

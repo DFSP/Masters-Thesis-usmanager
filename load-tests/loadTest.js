@@ -10,10 +10,10 @@ export let options = {
     ],
     ext: {
         loadimpact: {
-            projectID: 3524085,
             name: 'load-tests',
             distribution: {
-                kr: {loadZone: "amazon:us:palo alto", percent: 100},
+                uspalo: {loadZone: "amazon:us:palo alto", percent: 100},
+                //montreal: {loadZone: "amazon:ca:montreal", percent: 100},
             }
         }
     }
