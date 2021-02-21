@@ -59,7 +59,12 @@ func AddRequest(locationRequest data.LocationRequest) {
 	serviceRequests, hasRequests := locationRequests.Get(locationRequest.Service)
 	count := 1
 	if hasRequests && serviceRequests != nil {
-		count += serviceRequests.(data.LocationRequest).Count
+		requests := serviceRequests.([]data.LocationRequest)
+		for i := range requests {
+			if requests[i].Latitude == locationRequest.Latitude && requests[i].Longitude == locationRequest.Longitude {
+				count += requests[i].Count
+			}
+		}
 	}
 	newServiceRequests := data.LocationRequest{
 		Service: locationRequest.Service,
