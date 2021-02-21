@@ -131,7 +131,7 @@ public class RegistrationServerService {
 
     private String getRegistrationServerAddresses() {
         return elasticIpsService.getElasticIps().stream()
-                .map(address -> String.format("http://%s:%s/eureka", address.getPublicIp(), port))
+                .map(address -> String.format("http://%s:%s/eureka/", address.getPublicIp(), port))
                 .collect(Collectors.joining(","));
     }
 

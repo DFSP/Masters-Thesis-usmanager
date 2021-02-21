@@ -4,8 +4,8 @@ import {Rate} from "k6/metrics";
 
 export let options = {
     stages: [
-        {target: 50, duration: "5m"},
-        {target: 500, duration: "5m"},
+        {target: 10, duration: "5m"},
+        {target: 100, duration: "5m"},
         {target: 5, duration: "5m"},
     ],
     ext: {

@@ -64,12 +64,26 @@ public class Main {
 			.header("Authorization", dockerAuthorization)
 			.connectTimeoutMillis(CONNECTION_TIMEOUT).readTimeoutMillis(READ_TIMEOUT).build();
 		new Timer("container-monitor", false).schedule(new TimerTask() {
+			private long previousTime = System.currentTimeMillis();
+			double previousRxBytes = Double.MAX_VALUE;
+			double previousTxBytes = Double.MAX_VALUE;
 			@Override
 			public void run() {
+				long currentTime = System.currentTimeMillis();
+				int interval = (int) (currentTime - previousTime);
+				previousTime = currentTime;
 				try {
-					Map<String, Double> stats = getContainerStats(dockerClient, containerId, cpuCores);
-					String line = String.format(Locale.US, "%s,%.0f,%.3f,%.0f,%.0f", getTimestamp(startTime), stats.get("ram"),
-						stats.get("cpu-%"), stats.get("rx-bytes"), stats.get("tx-bytes"));
+					Map<String, Double> stats = getContainerStats(dockerClient, containerId, cpuCores, interval);
+					double currentRxBytes = stats.get("rx-bytes");
+					double rxBytesPerSec = Math.max(0, (currentRxBytes - previousRxBytes) / TimeUnit.MILLISECONDS.toSeconds(interval));
+					stats.put("rx-bytes-per-sec", rxBytesPerSec);
+					double currentTxBytes = stats.get("tx-bytes");
+					double txBytesPerSec = Math.max(0, (currentTxBytes - previousTxBytes) / TimeUnit.MILLISECONDS.toSeconds(interval));
+					stats.put("tx-bytes-per-sec", txBytesPerSec);
+					String line = String.format(Locale.US, "%s,%.0f,%.3f,%.0f,%.0f,%.0f,%.0f", getTimestamp(startTime),
+						stats.get("ram"), stats.get("cpu-%"), currentRxBytes, rxBytesPerSec, currentTxBytes, txBytesPerSec);
+					previousRxBytes = currentRxBytes;
+					previousTxBytes = currentTxBytes;
 					writer.write( line + "\n");
 					writer.flush();
 				}
@@ -88,7 +102,7 @@ public class Main {
 			Files.createFile(outFile);
 		}
 		FileWriter writer = new FileWriter(outFile.toFile());
-		writer.write("timestamp,ram,cpu-%,rx-bytes,tx-bytes\n");
+		writer.write("timestamp,ram,cpu-%,rx-bytes,rx-bytes-per-sec,tx-bytes,tx-bytes-per-sec\n");
 		writer.flush();
 		return writer;
 	}
@@ -99,7 +113,8 @@ public class Main {
 		return formatter.format(date);
 	}
 
-	private static Map<String, Double> getContainerStats(DockerClient dockerClient, String containerId, int cpuCores) throws DockerException, InterruptedException {
+	private static Map<String, Double> getContainerStats(DockerClient dockerClient, String containerId, int cpuCores, long interval)
+		throws DockerException, InterruptedException {
 		Map<String, Double> stats = new HashMap<>();
 		ContainerStats containerStats = dockerClient.stats(containerId);
 
