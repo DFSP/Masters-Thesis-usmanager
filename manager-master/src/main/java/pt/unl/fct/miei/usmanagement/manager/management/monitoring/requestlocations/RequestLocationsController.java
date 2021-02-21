@@ -3,6 +3,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.monitoring.requestlocati
 import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
+import pt.unl.fct.miei.usmanagement.manager.services.location.LocationRequest;
 import pt.unl.fct.miei.usmanagement.manager.services.location.LocationRequestsService;
 import pt.unl.fct.miei.usmanagement.manager.services.location.LocationWeight;
 
@@ -20,7 +21,7 @@ public class RequestLocationsController {
 	}
 
 	@GetMapping("/locations")
-	public Map<Node, Map<String, Integer>> getLocationRequests(@RequestParam(required = false) Long interval) {
+	public Map<Node, Map<String, LocationRequest>> getLocationRequests(@RequestParam(required = false) Long interval) {
 		return locationRequestsService.getNodesLocationRequests(interval, true);
 	}
 
