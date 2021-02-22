@@ -296,15 +296,20 @@ public class CloudHostsService {
 		}
 	}
 
-	public CloudHost launchInstance(Coordinates coordinates) {
-		log.info("Looking for the best aws region to start a cloud instance close to {}", coordinates);
+	public AwsRegion getClosestAwsRegion(Coordinates coordinates) {
 		List<AwsRegion> awsRegions = AwsRegion.getAwsRegions();
 		awsRegions.sort((oneRegion, anotherRegion) -> {
 			double oneDistance = oneRegion.getCoordinates().distanceTo(coordinates);
 			double anotherDistance = anotherRegion.getCoordinates().distanceTo(coordinates);
 			return Double.compare(oneDistance, anotherDistance);
 		});
-		AwsRegion awsRegion = awsRegions.get(0);
+		log.info("Aws regions sorted by distance to {}: {}", coordinates, awsRegions.stream().map(AwsRegion::getName).collect(Collectors.toList()));
+		return awsRegions.get(0);
+	}
+
+	public CloudHost launchInstance(Coordinates coordinates) {
+		log.info("Looking for the best aws region to start a cloud instance close to {}", coordinates);
+		AwsRegion awsRegion = getClosestAwsRegion(coordinates);
 		log.info("{} {} is the closest aws region with a distance of {} km", awsRegion.getZone(), awsRegion.getName(),
 			(int) awsRegion.getCoordinates().distanceTo(coordinates) / 1000);
 		return launchInstance(awsRegion);

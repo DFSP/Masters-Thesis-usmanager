@@ -88,7 +88,6 @@ public class Decision /*extends AbstractEntity<Long> */ {
   @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
   private Set<ServiceDecisionEntity> componentDecisionLogs;*/
 
-
 	public void removeServiceEvents() {
 		if (serviceEvents != null) {
 			serviceEvents.clear();

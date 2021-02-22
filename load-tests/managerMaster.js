@@ -3,8 +3,8 @@ import { check } from "k6";
 import encoding from "k6/encoding";
 
 export let options = {
-    vus: '10',
-    iterations: '10',
+    vus: 2,
+    iterations: 25,
 };
 
 const url = `http://${__ENV["HOST_ADDRESS"]}:8080/api/${__ENV["URL"]}`;
@@ -13,7 +13,7 @@ const params = {
         "Authorization": `Basic ${encoding.b64encode("admin:admin")}`,
         "Content-Type": "application/json"
     },
-    timeout: "300s"
+    timeout: "91100s"
 };
 export default function () {
     const method = __ENV["METHOD"].toUpperCase();

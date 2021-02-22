@@ -1,11 +1,9 @@
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring.requestlocations;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
+import pt.unl.fct.miei.usmanagement.manager.services.location.LocationRequest;
 import pt.unl.fct.miei.usmanagement.manager.services.location.LocationRequestsService;
 import pt.unl.fct.miei.usmanagement.manager.services.location.LocationWeight;
 
@@ -23,18 +21,18 @@ public class RequestLocationsController {
 	}
 
 	@GetMapping("/locations")
-	public Map<Node, Map<String, Integer>> getLocationRequests() {
-		return locationRequestsService.getNodesLocationRequests();
+	public Map<Node, Map<String, List<LocationRequest>>> getLocationRequests(@RequestParam(required = false) Long interval) {
+		return locationRequestsService.getNodesLocationRequests(interval, true);
 	}
 
 	@GetMapping("/locations/weight")
-	public Map<String, List<LocationWeight>> getLocationsWeight() {
-		return locationRequestsService.getLocationsWeight();
+	public Map<String, List<LocationWeight>> getLocationsWeight(@RequestParam(required = false) Long interval) {
+		return locationRequestsService.getLocationsWeight(interval, true);
 	}
 
 	@GetMapping("/services/middle-point")
-	public Map<String, Coordinates> getServicesWeightedMiddlePoint() {
-		return locationRequestsService.getServicesWeightedMiddlePoint();
+	public Map<String, Coordinates> getServicesWeightedMiddlePoint(@RequestParam(required = false) Long interval) {
+		return locationRequestsService.getServicesWeightedMiddlePoint(interval, true);
 	}
 
 }

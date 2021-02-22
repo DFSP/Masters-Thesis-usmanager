@@ -4,16 +4,16 @@ import {Rate} from "k6/metrics";
 
 export let options = {
     stages: [
-        {target: 50, duration: "5m"},
-        {target: 500, duration: "5m"},
-        {target: 5, duration: "5m"},
+        {target: 10, duration: "3m"},
+        {target: 50, duration: "3m"},
+        {target: 5, duration: "3m"},
     ],
     ext: {
         loadimpact: {
-            projectID: 3524085,
             name: 'load-tests',
             distribution: {
-                kr: {loadZone: "amazon:kr:seoul", percent: 100},
+                uspalo: {loadZone: "amazon:us:palo alto", percent: 100},
+                //montreal: {loadZone: "amazon:ca:montreal", percent: 100},
             }
         }
     }

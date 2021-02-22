@@ -63,45 +63,52 @@ public class HostMetricsService {
 	public boolean hostHasEnoughResources(HostAddress hostAddress, double expectedMemoryConsumption) {
 		Optional<Integer> port = containersService.getSingletonContainer(hostAddress, ServiceConstants.Name.PROMETHEUS)
 			.map(c -> c.getPorts().stream().findFirst().get().getPublicPort());
+		if (port.isEmpty()) {
+			log.info("Failed to find prometheus container on host {}", hostAddress);
+			return false;
+		}
 
 		List<PrometheusQueryEnum> prometheusQueries = List.of(
-				PrometheusQueryEnum.TOTAL_MEMORY,
-				PrometheusQueryEnum.AVAILABLE_MEMORY,
-				PrometheusQueryEnum.CPU_USAGE_PERCENTAGE);
+			PrometheusQueryEnum.TOTAL_MEMORY,
+			PrometheusQueryEnum.AVAILABLE_MEMORY,
+			PrometheusQueryEnum.CPU_USAGE_PERCENTAGE,
+			PrometheusQueryEnum.CPU_CORES);
 
-		List<Optional<Double>> metrics = new ArrayList<>(prometheusQueries.size());
+		Map<PrometheusQueryEnum, Optional<Double>> metrics = new HashMap<>(prometheusQueries.size());
 
 		CompletableFuture<?>[] requests = new CompletableFuture[prometheusQueries.size()];
 		int count = 0;
 		for (PrometheusQueryEnum prometheusQuery : prometheusQueries) {
-			if (port.isEmpty()) {
-				metrics.add(Optional.empty());
-			}
-			else {
-				CompletableFuture<?> future = CompletableFuture
-						.supplyAsync(() -> prometheusService.getStat(hostAddress, port.get(), prometheusQuery))
-						.exceptionally(ex -> Optional.empty())
-						.thenAccept(metrics::add);
-				requests[count++] = future;
-			}
+			CompletableFuture<?> future = CompletableFuture
+				.supplyAsync(() -> prometheusService.getStat(hostAddress, port.get(), prometheusQuery))
+				.exceptionally(ex -> Optional.empty())
+				.thenAccept(metric -> metrics.put(prometheusQuery, metric));
+			requests[count++] = future;
 		}
-
 		CompletableFuture.allOf(requests).join();
 
-		Optional<Double> totalRam = metrics.get(0);
-		Optional<Double> availableRam = metrics.get(1);
-		Optional<Double> cpuUsage = metrics.get(2);
-		if (totalRam.isPresent() && availableRam.isPresent() && cpuUsage.isPresent()) {
+		Optional<Double> totalRam = metrics.get(PrometheusQueryEnum.TOTAL_MEMORY);
+		Optional<Double> availableRam = metrics.get(PrometheusQueryEnum.AVAILABLE_MEMORY);
+		Optional<Double> cpuUsage = metrics.get(PrometheusQueryEnum.CPU_USAGE_PERCENTAGE);
+		Optional<Double> cpuCores = metrics.get(PrometheusQueryEnum.CPU_CORES);
+		if (totalRam != null && totalRam.isPresent()
+			&& availableRam != null
+			&& availableRam.isPresent()
+			&& cpuUsage != null && cpuUsage.isPresent()
+			&& cpuCores != null && cpuCores.isPresent()) {
 			double totalRamValue = totalRam.get();
 			double availableRamValue = availableRam.get();
 			double predictedRamUsage = (1.0 - ((availableRamValue - expectedMemoryConsumption) / totalRamValue)) * 100.0;
 			boolean hasEnoughMemory = predictedRamUsage < maximumRamPercentage;
-			log.info("Node {} {} enough ram, predictedRamUsage={} {} maximumRamPercentage={}",
-				hostAddress, hasEnoughMemory ? "has" : "doesn't have", predictedRamUsage, hasEnoughMemory ? "<" : ">=", maximumRamPercentage);
-			double cpuUsageValue = cpuUsage.get();
+			log.info("Node {} {} enough ram, predictedRamUsage={} {} maximumRamPercentage={} (total ram={}, available ram={})",
+				hostAddress, hasEnoughMemory ? "has" : "doesn't have", predictedRamUsage, hasEnoughMemory ? "<" : ">=",
+				maximumRamPercentage, totalRamValue, availableRamValue);
+			double cpuCoresNumber = cpuCores.get();
+			double cpuUsageValue = cpuCoresNumber == 0 ? cpuUsage.get() : cpuUsage.get() / cpuCoresNumber;
 			boolean hasEnoughCpu = cpuUsageValue < maximumCpuPercentage;
 			log.info("Node {} {} enough cpu, cpuUsage={} {} maximumCpuPercentage={}",
-				hostAddress, hasEnoughCpu ? "has" : "doesn't have", cpuUsageValue, hasEnoughCpu ? "<" : ">=", maximumCpuPercentage);
+				hostAddress, hasEnoughCpu ? "has" : "doesn't have", cpuUsageValue, hasEnoughCpu ? "<" : ">=",
+				maximumCpuPercentage);
 			return hasEnoughMemory && hasEnoughCpu;
 		}
 		log.info("Node {} doesn't have enough capacity: failed to fetch metrics", hostAddress);

@@ -47,6 +47,8 @@ func RegisterRequest(service string) {
 	locationRequest := data.LocationRequest{
 		Service: service,
 		Count:   1,
+		Latitude: instance.Latitude,
+		Longitude: instance.Longitude,
 	}
 	AddRequest(locationRequest)
 }
@@ -57,13 +59,40 @@ func AddRequest(locationRequest data.LocationRequest) {
 	serviceRequests, hasRequests := locationRequests.Get(locationRequest.Service)
 	count := 1
 	if hasRequests && serviceRequests != nil {
-		count += serviceRequests.(data.LocationRequest).Count
+		requests := serviceRequests.([]data.LocationRequest)
+		index := -1
+		for i := range requests {
+			if requests[i].Latitude == locationRequest.Latitude && requests[i].Longitude == locationRequest.Longitude {
+				count += requests[i].Count
+				index = i
+				break
+			}
+		}
+		newServiceRequest := data.LocationRequest{
+			Service: locationRequest.Service,
+			Count:   count,
+			Latitude: locationRequest.Latitude,
+			Longitude: locationRequest.Longitude,
+		}
+		//requests = append(requests[:i+1], requests[i:]...)
+		if index != -1 {
+			requests[index] = newServiceRequest
+		} else {
+			requests = append(requests, newServiceRequest)
+		}
+		locationRequests.Set(locationRequest.Service, requests)
+	} else {
+		var newServiceRequests []data.LocationRequest
+		request := data.LocationRequest{
+			Service: locationRequest.Service,
+			Count:   count,
+			Latitude: locationRequest.Latitude,
+			Longitude: locationRequest.Longitude,
+		}
+		newServiceRequests = append(newServiceRequests, request)
+		locationRequests.Set(locationRequest.Service, newServiceRequests)
 	}
-	newServiceRequests := data.LocationRequest{
-		Service: locationRequest.Service,
-		Count:   count,
-	}
-	locationRequests.Set(locationRequest.Service, newServiceRequests)
+
 }
 
 func clear(serviceKey string) {
@@ -98,8 +127,8 @@ func sendRequestsData() {
 		serviceKey := mapItem.Key
 		value := mapItem.Value
 		if value != nil {
-			serviceRequests := value.(data.LocationRequest)
-			if serviceRequests.Count > 0 {
+			serviceRequests := value.([]data.LocationRequest)
+			if len(serviceRequests) > 0 {
 				go sendData(serviceRequests)
 				go clear(serviceKey)
 			}
@@ -107,7 +136,7 @@ func sendRequestsData() {
 	}
 }
 
-func sendData(data data.LocationRequest) {
+func sendData(data []data.LocationRequest) {
 	jsonValue, _ := json.Marshal(data)
 	req, err := http.NewRequest("POST", instance.RequestLocationMonitorUrl, bytes.NewBuffer(jsonValue))
 	if err == nil {
@@ -115,7 +144,7 @@ func sendData(data data.LocationRequest) {
 		client := &http.Client{}
 		resp, err := client.Do(req)
 		if err != nil {
-			reglog.Logger.Infof("Failed to send location data %+v to %s", data, req.RequestURI)
+			reglog.Logger.Infof("Failed to send location data %+v to request-monitor", data)
 		} else {
 			defer resp.Body.Close()
 			reglog.Logger.Infof("Sent location data %s", jsonValue)

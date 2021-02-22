@@ -63,15 +63,13 @@ public class ContainersController {
 	private final ContainersService containersService;
 	private final WorkerManagersService workerManagersService;
 	private final SyncService syncService;
-	private final HostsService hostsService;
 	private final NodesService nodesService;
 
 	public ContainersController(ContainersService containersService, WorkerManagersService workerManagersService,
-								SyncService syncService, HostsService hostsService, NodesService nodesService) {
+								SyncService syncService, NodesService nodesService) {
 		this.containersService = containersService;
 		this.workerManagersService = workerManagersService;
 		this.syncService = syncService;
-		this.hostsService = hostsService;
 		this.nodesService = nodesService;
 	}
 

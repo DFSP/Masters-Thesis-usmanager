@@ -104,6 +104,7 @@ public class ServiceSimulatedMetric /*extends AbstractEntity<Long> */ {
 	}
 
 	public void removeAssociations() {
+		field.getSimulatedServiceMetrics().remove(this);
 		Iterator<Service> servicesIterator = services.iterator();
 		while (servicesIterator.hasNext()) {
 			Service service = servicesIterator.next();

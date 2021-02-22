@@ -27,8 +27,10 @@ package pt.unl.fct.miei.usmanagement.manager.services.location;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.env.Environment;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -43,6 +45,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 
 import java.util.*;
@@ -56,6 +59,8 @@ public class LocationRequestsService {
 	private final NodesService nodesService;
 	private final HostsService hostsService;
 	private final ContainersService containersService;
+	private final DockerSwarmService dockerSwarmService;
+	private final Environment environment;
 
 	private final String managerId;
 	private final int port;
@@ -64,12 +69,14 @@ public class LocationRequestsService {
 	private final Map<String, Long> lastRequestTime;
 
 	public LocationRequestsService(NodesService nodesService, @Lazy HostsService hostsService,
-								   @Lazy ContainersService containersService, DockerProperties dockerProperties,
+								   @Lazy ContainersService containersService, DockerSwarmService dockerSwarmService, DockerProperties dockerProperties,
 								   LocationRequestsProperties locationRequestsProperties, RequestLocationRequestInterceptor requestInterceptor,
 								   Environment environment) {
 		this.nodesService = nodesService;
 		this.hostsService = hostsService;
 		this.containersService = containersService;
+		this.dockerSwarmService = dockerSwarmService;
+		this.environment = environment;
 		this.dockerHubUsername = dockerProperties.getHub().getUsername();
 		this.managerId = environment.getProperty(ContainerConstants.Environment.Manager.ID);
 		this.port = locationRequestsProperties.getPort();
@@ -79,23 +86,40 @@ public class LocationRequestsService {
 	}
 
 	public Map<String, Coordinates> getServicesWeightedMiddlePoint() {
-		return getLocationsWeight().entrySet().stream()
+		return getServicesWeightedMiddlePoint(0L, false);
+	}
+
+	public Map<String, Coordinates> getServicesWeightedMiddlePoint(Long interval, boolean manual) {
+		return getLocationsWeight(interval, manual).entrySet().stream()
 			.collect(Collectors.toMap(Map.Entry::getKey, e -> getServiceWeightedMiddlePoint(e.getValue())));
 	}
 
 	public Map<String, List<LocationWeight>> getLocationsWeight() {
-		Map<Node, Map<String, Integer>> nodeLocationRequests = getNodesLocationRequests();
+		return getLocationsWeight(0L, false);
+	}
+
+	public Map<String, List<LocationWeight>> getLocationsWeight(Long interval, boolean manual) {
+		Map<Node, Map<String, List<LocationRequest>>> nodeLocationRequests = getNodesLocationRequests(interval, manual);
 
 		Map<String, List<LocationWeight>> servicesLocationsWeights = new HashMap<>();
-		for (Map.Entry<Node, Map<String, Integer>> requests : nodeLocationRequests.entrySet()) {
-			Node node = requests.getKey();
-			requests.getValue().forEach((service, count) -> {
+		for (Map.Entry<Node, Map<String, List<LocationRequest>>> nodesRequests : nodeLocationRequests.entrySet()) {
+			//Node node = nodesRequests.getKey();
+			nodesRequests.getValue().forEach((service, nodeRequest) -> {
 				List<LocationWeight> locationWeights = servicesLocationsWeights.get(service);
 				if (locationWeights == null) {
 					locationWeights = new ArrayList<>(1);
 				}
-				LocationWeight locationWeight = new LocationWeight(node, count);
-				locationWeights.add(locationWeight);
+				for (LocationRequest locationRequest : nodeRequest) {
+					double latitude = locationRequest.getLatitude();
+					double longitude = locationRequest.getLongitude();
+					if (latitude == 0 || longitude == 0) {
+						continue;
+					}
+					Coordinates coordinates = new Coordinates(latitude, longitude);
+					int count = locationRequest.getCount();
+					LocationWeight locationWeight = new LocationWeight(coordinates, count);
+					locationWeights.add(locationWeight);
+				}
 				servicesLocationsWeights.put(service, locationWeights);
 			});
 		}
@@ -110,9 +134,8 @@ public class LocationRequestsService {
 		double x = 0, y = 0, z = 0;
 
 		for (LocationWeight locationWeight : locationWeights) {
-			Node node = locationWeight.getNode();
+			Coordinates coordinates = locationWeight.getCoordinates();
 			int weight = locationWeight.getWeight();
-			Coordinates coordinates = node.getCoordinates();
 			double latitude = coordinates.getLatitude();
 			double longitude = coordinates.getLongitude();
 
@@ -151,10 +174,16 @@ public class LocationRequestsService {
 		return coordinates;
 	}
 
-	public Map<Node, Map<String, Integer>> getNodesLocationRequests() {
-		Map<Node, Map<String, Integer>> nodeLocationRequests = new HashMap<>();
+	public Map<Node, Map<String, List<LocationRequest>>> getNodesLocationRequests() {
+		return getNodesLocationRequests(null, false);
+	}
 
-		List<Node> nodes = nodesService.getReadyNodes();
+	public Map<Node, Map<String, List<LocationRequest>>> getNodesLocationRequests(Long interval, boolean manualRequest) {
+		Map<Node, Map<String, List<LocationRequest>>> nodeLocationRequests = new HashMap<>();
+
+		List<Node> nodes = Objects.equals(environment.getProperty(ContainerConstants.Environment.Manager.ID), ServiceConstants.Name.MASTER_MANAGER)
+			? nodesService.getReadyNodes()
+			: dockerSwarmService.getReadyNodes().stream().map(nodesService::fromSwarmNode).collect(Collectors.toList());
 
 		List<CompletableFuture<?>> requests = new ArrayList<>();
 		for (Node node : nodes) {
@@ -163,7 +192,7 @@ public class LocationRequestsService {
 				.map(c -> c.getPorts().stream().findFirst().get().getPublicPort());
 			if (port.isPresent()) {
 				CompletableFuture<?> request = CompletableFuture
-					.supplyAsync(() -> getNodeLocationRequests(hostname, port.get()))
+					.supplyAsync(() -> getNodeLocationRequests(hostname, port.get(), interval, manualRequest))
 					.thenAccept(locationRequests -> nodeLocationRequests.put(node, locationRequests));
 				requests.add(request);
 			}
@@ -177,21 +206,31 @@ public class LocationRequestsService {
 		return nodeLocationRequests;
 	}
 
-	public Map<String, Integer> getNodeLocationRequests(String hostname, int port) {
+	public Map<String, List<LocationRequest>> getNodeLocationRequests(String hostname, int port, Long interval, boolean manualRequest) {
 		String url = String.format("http://%s:%s/api/location/requests?aggregation", hostname, port);
 		long currentRequestTime = System.currentTimeMillis();
-		Long interval = lastRequestTime.get(hostname);
-		if (interval != null && interval > 0) {
-			interval = currentRequestTime - interval;
+		if (interval != null) {
 			url += String.format("&interval=%d", interval);
 		}
-		lastRequestTime.put(hostname, interval);
+		else {
+			interval = lastRequestTime.get(hostname);
+			if (interval != null && interval > 0) {
+				interval = currentRequestTime - interval;
+				url += String.format("&interval=%d", interval);
+			}
+			if (!manualRequest) {
+				lastRequestTime.put(hostname, interval);
+			}
+		}
 
 		log.info("Requesting location requests from {}", url);
 
-		Map<String, Integer> locationMonitoringData = new HashMap<>();
+		Map<String, List<LocationRequest>> locationMonitoringData = new HashMap<>();
 		try {
-			locationMonitoringData = restTemplate.getForObject(url, Map.class);
+			ParameterizedTypeReference<Map<String, List<LocationRequest>>> typeRef = new ParameterizedTypeReference<>() {
+			};
+			ResponseEntity<Map<String, List<LocationRequest>>> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef);
+			locationMonitoringData = responseEntity.getBody();
 			log.info("Got reply from {}: {}", url, locationMonitoringData);
 		}
 		catch (RestClientException e) {

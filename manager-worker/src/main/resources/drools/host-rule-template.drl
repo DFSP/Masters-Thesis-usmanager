@@ -6,7 +6,7 @@ eventType
 decision
 priority
 
-package pt.unl.fct.miei.usmanagement.manager.management.rulesystem;
+package rules;
 
 import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.Decision;
 
@@ -14,7 +14,7 @@ global pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.Decisio
 
 template "host"
 
-rule "host_@{ruleId}" salience @{priority}
+rule "host_rule_@{ruleId}" salience @{priority}
 when
     @{eventType}(@{rule})
 then

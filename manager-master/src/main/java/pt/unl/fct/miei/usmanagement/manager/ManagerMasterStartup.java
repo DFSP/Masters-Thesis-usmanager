@@ -85,18 +85,19 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 		HostAddress hostAddress = hostAddressJson == null
 				? hostsService.setManagerHostAddress()
 				: hostsService.setManagerHostAddress(new Gson().fromJson(hostAddressJson, HostAddress.class));
-		if (managerServicesConfiguration.getMode() != Mode.LOCAL) {
+		Mode mode = managerServicesConfiguration.getMode();
+		if (mode != Mode.LOCAL) {
 			elasticIpsService.allocateElasticIpAddresses();
 		}
 		hostsService.setupHost(hostAddress, NodeRole.MANAGER);
 		hostsService.clusterHosts();
-		servicesMonitoringService.initServiceMonitorTimer();
-		hostsMonitoringService.initHostMonitorTimer();
-		if (managerServicesConfiguration.getMode() != Mode.LOCAL) {
+		if (mode != Mode.LOCAL) {
 			syncService.startCloudHostsDatabaseSynchronization();
 		}
 		syncService.startContainersDatabaseSynchronization();
 		syncService.startNodesDatabaseSynchronization();
+		servicesMonitoringService.initServiceMonitorTimer();
+		hostsMonitoringService.initHostMonitorTimer();
 	}
 
 	private void requireEnvVars() {

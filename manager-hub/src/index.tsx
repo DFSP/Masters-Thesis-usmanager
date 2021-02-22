@@ -32,12 +32,15 @@ import Root from "./containers/Root";
 import {BrowserRouter} from "react-router-dom";
 import configureStore from "./store/configureStore";
 import {saveState} from "./store/localStorage";
+import {setBrightnessMode} from "./utils/bightnessMode";
 
 const store = configureStore();
 
 store.subscribe(() => {
     saveState(store.getState());
 });
+
+setBrightnessMode();
 
 ReactDOM.render(
     <BrowserRouter>

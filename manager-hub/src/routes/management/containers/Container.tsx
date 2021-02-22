@@ -765,6 +765,7 @@ class Container extends BaseComponent<Props, State> {
                               failureCallback: this.onDeleteFailure
                           }}
                           customButtons={!isNewContainer && container && (container as IContainer).labels?.['serviceType'] !== 'SYSTEM'
+                              && (container as IContainer).state !== 'down'
                               ? [{button: this.replicateButton()}, {button: this.migrateButton()}]
                               : undefined}
                           loading={this.state.loading}

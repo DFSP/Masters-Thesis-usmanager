@@ -86,8 +86,8 @@ func GetServiceEndpoint(w http.ResponseWriter, r *http.Request) {
 		reglog.Logger.Infof("Found no instances")
 		w.WriteHeader(http.StatusNotFound)
 	} else {
-		reglog.Logger.Infof("cached instances: %s", instances)
-		reglog.Logger.Infof("Instance chosen for %s: %s", service, instanceEndpoint.InstanceId)
+		reglog.Logger.Infof("Cached instances: %s", instances)
+		reglog.Logger.Infof("Instance chosen for %s: id = %s address = %s", service, instanceEndpoint.InstanceId, instanceEndpoint.Endpoint)
 		_ = json.NewEncoder(w).Encode(instanceEndpoint)
 	}
 
