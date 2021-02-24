@@ -158,8 +158,8 @@ com tipo de acesso Programmatic access, e política AdministratorAccess. Substit
 - [Configurar chaves](https://aws.amazon.com/pt/premiumsupport/knowledge-center/ec2-ssh-key-pair-regions/) em todas as regiões disponíveis.
 
 ### Bugs
-Quando existem demasiados utilizadores a aceder aos gestores: https://stackoverflow.com/questions/32968530/hikaricp-connection-is-not-available
-Erro ao apagar regras e métricas simuladas, e as suas entidades: ver associações nas tabelas da base de dados.
+- Quando existem demasiados utilizadores a aceder aos gestores: https://stackoverflow.com/questions/32968530/hikaricp-connection-is-not-available
+- Erro ao apagar regras e métricas simuladas, e as suas entidades: ver associações nas tabelas da base de dados.
 
 ### Licença
 
