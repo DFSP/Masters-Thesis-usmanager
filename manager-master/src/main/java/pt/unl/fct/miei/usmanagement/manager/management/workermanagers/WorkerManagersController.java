@@ -50,7 +50,12 @@ public class WorkerManagersController {
 	private final WorkerManagersService workerManagersService;
 	private final ManagerServicesConfiguration managerServicesConfiguration;
 
+<<<<<<< HEAD:usmanager/manager/manager-master/src/main/java/pt/unl/fct/miei/usmanagement/manager/management/workermanagers/WorkerManagersController.java
+	public WorkerManagersController(WorkerManagersService workerManagersService,
+									ManagerServicesConfiguration managerServicesConfiguration) {
+=======
 	public WorkerManagersController(WorkerManagersService workerManagersService, ManagerServicesConfiguration managerServicesConfiguration) {
+>>>>>>> 02b9fb7e15ad1655a7a18f29507ba6f0ca23dee7:manager-master/src/main/java/pt/unl/fct/miei/usmanagement/manager/management/workermanagers/WorkerManagersController.java
 		this.workerManagersService = workerManagersService;
 		this.managerServicesConfiguration = managerServicesConfiguration;
 	}
@@ -68,7 +73,11 @@ public class WorkerManagersController {
 	@PostMapping
 	public List<WorkerManager> launchWorkerManagers(@RequestBody LaunchWorkerManager launchWorkerManager) {
 		if (managerServicesConfiguration.getMode() == Mode.LOCAL) {
+<<<<<<< HEAD:usmanager/manager/manager-master/src/main/java/pt/unl/fct/miei/usmanagement/manager/management/workermanagers/WorkerManagersController.java
+			throw new BadRequestException("local managers can't be launched on local mode configuration");
+=======
 			throw new BadRequestException("worker managers are not supported when using local execution mode");
+>>>>>>> 02b9fb7e15ad1655a7a18f29507ba6f0ca23dee7:manager-master/src/main/java/pt/unl/fct/miei/usmanagement/manager/management/workermanagers/WorkerManagersController.java
 		}
 		HostAddress hostAddress = launchWorkerManager.getHostAddress();
 		List<String> regions = launchWorkerManager.getRegions();
