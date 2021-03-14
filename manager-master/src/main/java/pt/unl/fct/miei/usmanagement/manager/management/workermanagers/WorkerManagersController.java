@@ -50,7 +50,8 @@ public class WorkerManagersController {
 	private final WorkerManagersService workerManagersService;
 	private final ManagerServicesConfiguration managerServicesConfiguration;
 
-	public WorkerManagersController(WorkerManagersService workerManagersService, ManagerServicesConfiguration managerServicesConfiguration) {
+	public WorkerManagersController(WorkerManagersService workerManagersService,
+									ManagerServicesConfiguration managerServicesConfiguration) {
 		this.workerManagersService = workerManagersService;
 		this.managerServicesConfiguration = managerServicesConfiguration;
 	}

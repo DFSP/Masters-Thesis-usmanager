@@ -40,7 +40,7 @@ manager:
     tests:
       enabled: ${tests:true}
   services:
-    mode: ${mode:global}
+    mode: ${mode:local}
 ssh:
   connection-timeout: 10000
 edge:

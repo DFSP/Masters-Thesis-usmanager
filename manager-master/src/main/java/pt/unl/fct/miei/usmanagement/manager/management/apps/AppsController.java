@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
+import pt.unl.fct.miei.usmanagement.manager.config.ManagerServicesConfiguration;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
@@ -41,6 +42,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 import pt.unl.fct.miei.usmanagement.manager.services.apps.AppsService;
 import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.util.validate.Validation;
+import pt.unl.fct.miei.usmanagement.manager.Mode;
 
 import java.util.Arrays;
 import java.util.List;
@@ -53,10 +55,13 @@ public class AppsController {
 
 	private final AppsService appsService;
 	private final WorkerManagersService workerManagersService;
+	private final ManagerServicesConfiguration managerServicesConfiguration;
 
-	public AppsController(AppsService appsService, WorkerManagersService workerManagersService) {
+	public AppsController(AppsService appsService, WorkerManagersService workerManagersService,
+						  ManagerServicesConfiguration managerServicesConfiguration) {
 		this.appsService = appsService;
 		this.workerManagersService = workerManagersService;
+		this.managerServicesConfiguration = managerServicesConfiguration;
 	}
 
 	@GetMapping
@@ -110,8 +115,9 @@ public class AppsController {
 
 	@PostMapping("/{appName}/launch")
 	public Map<String, List<Container>> launch(@PathVariable String appName, @RequestBody Coordinates coordinates) {
-		//return appsService.launch(appName, coordinates);
-		return workerManagersService.launchApp(appName, coordinates);
+		return managerServicesConfiguration.getMode() == Mode.LOCAL
+			? appsService.launch(appName, coordinates)
+			: workerManagersService.launchApp(appName, coordinates);
 	}
 
 	@GetMapping("/{appId}/rules")
