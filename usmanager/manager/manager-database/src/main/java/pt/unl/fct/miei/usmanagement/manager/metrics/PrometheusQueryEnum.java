@@ -43,6 +43,7 @@ public enum PrometheusQueryEnum {
 	AVAILABLE_MEMORY_RATE("node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes"),
 	MEMORY_USAGE_PERCENTAGE("100 * (1 - ((avg_over_time(node_memory_MemFree_bytes[5m]) + avg_over_time(node_memory_Cached_bytes[5m]) + avg_over_time(node_memory_Buffers_bytes[5m])) / avg_over_time(node_memory_MemTotal_bytes[5m])))"),
 	CPU_USAGE_PERCENTAGE("100-(avg by (instance) (irate(node_cpu_seconds_total{job=\"node_exporter\",mode=\"idle\"}[5m]))*100)"),
+	CPU_CORES("count without(cpu, mode) (node_cpu_seconds_total{mode=\"idle\"})"),
 	FILESYSTEM_AVAILABLE_SPACE("node_filesystem_avail_bytes{mountpoint='/'}"),
 	NETWORK_BYTES_RECEIVED("rate(node_network_receive_bytes_total[5m])");
 

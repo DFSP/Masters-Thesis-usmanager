@@ -15,4 +15,10 @@ export const setLightMode = () => {
     localStorage.setItem('brightness-mode', 'light-mode');
 }
 
+export const setBrightnessMode = () => {
+    if (isLightMode()) {
+        document.body.classList.add('light-mode');
+    }
+}
+
 export const toggleBrightness = () => isDarkMode() ? setLightMode() : setDarkMode()

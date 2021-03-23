@@ -42,6 +42,7 @@ import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringLog;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecision;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaTopicKey;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
@@ -96,7 +97,7 @@ public class MasterKafkaService {
 		int i = 0;
 		for (ContainerDTO containerDTO : containerDTOs) {
 			KafkaTopicKey key = keys.get(i++);
-			if (key != null && key.getManagerId() != null && key.getManagerId().equalsIgnoreCase("manager-master")) {
+			if (key != null && key.getManagerId() != null && key.getManagerId().equalsIgnoreCase(ServiceConstants.Name.MASTER_MANAGER)) {
 				continue;
 			}
 			log.debug("Received key={} message={}", key, containerDTO);
@@ -123,7 +124,7 @@ public class MasterKafkaService {
 		int i = 0;
 		for (NodeDTO nodeDTO : nodeDTOs) {
 			KafkaTopicKey key = keys.get(i++);
-			if (key != null && key.getManagerId() != null && key.getManagerId().equalsIgnoreCase("manager-master")) {
+			if (key != null && key.getManagerId() != null && key.getManagerId().equalsIgnoreCase(ServiceConstants.Name.MASTER_MANAGER)) {
 				continue;
 			}
 			log.debug("Received key={} message={}", key, nodeDTO.toString());
@@ -151,7 +152,7 @@ public class MasterKafkaService {
 		for (CloudHostDTO cloudHostDTO : cloudHostDTOs) {
 			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, cloudHostDTO.toString());
-			if (key != null && key.getManagerId() != null && key.getManagerId().equalsIgnoreCase("manager-master")) {
+			if (key != null && key.getManagerId() != null && key.getManagerId().equalsIgnoreCase(ServiceConstants.Name.MASTER_MANAGER)) {
 				continue;
 			}
 			CloudHost cloudHost = CloudHostMapper.MAPPER.toCloudHost(cloudHostDTO, context);

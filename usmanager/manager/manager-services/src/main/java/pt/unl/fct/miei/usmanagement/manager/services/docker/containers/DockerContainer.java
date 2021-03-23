@@ -56,7 +56,7 @@ public final class DockerContainer {
 	private final Map<String, String> labels;
 
 	public HostAddress getHostAddress() {
-		return new HostAddress(publicIpAddress, privateIpAddress);
+		return new HostAddress(publicIpAddress, privateIpAddress, coordinates);
 	}
 
 	@Override

@@ -24,44 +24,43 @@
 
 package pt.unl.fct.miei.usmanagement.manager.services.hosts;
 
+import com.google.gson.Gson;
 import com.spotify.docker.client.messages.swarm.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.Mode;
 import pt.unl.fct.miei.usmanagement.manager.config.ManagerServicesConfiguration;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.MethodNotAllowedException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
+import pt.unl.fct.miei.usmanagement.manager.nodes.NodeConstants;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.bash.BashCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.services.bash.BashService;
-import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.DockerProperties;
-import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerContainer;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.aws.AwsInstanceState;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.aws.AwsProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.edge.EdgeHostsService;
-import pt.unl.fct.miei.usmanagement.manager.services.location.LocationRequestsService;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.HostMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.services.remote.ssh.SshCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.services.remote.ssh.SshService;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 
+import javax.ws.rs.BadRequestException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -80,6 +79,9 @@ import java.util.stream.Stream;
 @Slf4j
 @Service
 public class HostsService {
+
+	private static final double HOST_DISTANCE_FACTOR = 1.25;
+	private static final double NEW_HOST_DISTANCE_FACTOR = 1.5;
 
 	private final NodesService nodesService;
 	private final ContainersService containersService;
@@ -262,7 +264,7 @@ public class HostsService {
 			throw new ManagerException("Failed to setup %s with role %s", hostAddress.toSimpleString(), role.name());
 		}
 		containersService.addContainer(dockerApiProxyContainerId);
-		
+
 		Stream<Supplier<Container>> tasks = Stream.of(
 			() -> launchRequestLocationMonitor(hostAddress),
 			() -> launchPrometheus(hostAddress)
@@ -326,7 +328,7 @@ public class HostsService {
 		if (managerServicesConfiguration.getMode() == Mode.LOCAL) {
 			return getManagerHostAddress();
 		}
-		log.info("Looking for node on region {} with <90% memory available and <90% cpu usage to launch service with {} expected ram usage",
+		log.info("Looking for node on region {} with enough resources to launch service with {} expected ram usage",
 			region.getRegion(), availableMemory);
 		List<HostAddress> nodes = nodesService.getReadyNodes().stream()
 			.filter(node -> node.getRegion() == region && hostMetricsService.hostHasEnoughResources(node.getHostAddress(), availableMemory)
@@ -354,8 +356,12 @@ public class HostsService {
 		if (managerServicesConfiguration.getMode() == Mode.LOCAL) {
 			return getManagerHostAddress();
 		}
-		List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes = nodesService.getReadyNodes().stream().filter(node -> {
-			HostAddress hostAddress = node.getHostAddress();
+		Gson gson = new Gson();
+		List<Node> nodes = dockerSwarmService.getReadyNodes().stream().filter(node -> {
+			String publicIp = node.status().addr();
+			String privateIp = node.spec().labels().get(NodeConstants.Label.PRIVATE_IP_ADDRESS);
+			Coordinates nodeCoordinates = gson.fromJson(node.spec().labels().get(NodeConstants.Label.COORDINATES), Coordinates.class);
+			HostAddress hostAddress = new HostAddress(publicIp, privateIp, nodeCoordinates);
 			return !hostAddresses.contains(hostAddress) && hostMetricsService.hostHasEnoughResources(hostAddress, availableMemory);
 		}).collect(Collectors.toList());
 		return getClosestNode(coordinates, nodes);
@@ -373,23 +379,93 @@ public class HostsService {
 		return getClosestHost(coordinates, inactiveEdgeHosts, inactiveCloudHosts);
 	}
 
-	public HostAddress getClosestNode(Coordinates coordinates, List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes) {
+	public HostAddress getClosestNode(Coordinates coordinates, List<Node> nodes) {
+		log.info("Getting closest node of list {} to {}", nodes.stream()
+			.map(node -> node.id() + ":" + node.status().addr() + ":" + node.spec().labels().get(NodeConstants.Label.COORDINATES))
+			.collect(Collectors.toList()), coordinates);
 		if (managerServicesConfiguration.getMode() == Mode.LOCAL) {
 			return getManagerHostAddress();
 		}
+		Gson gson = new Gson();
 		nodes.sort((oneNode, anotherNode) -> {
-			double oneDistance = oneNode.getCoordinates().distanceTo(coordinates);
-			double anotherDistance = anotherNode.getCoordinates().distanceTo(coordinates);
+			Coordinates oneCoordinates = gson.fromJson(oneNode.spec().labels().get(NodeConstants.Label.COORDINATES), Coordinates.class);
+			double oneDistance = oneCoordinates.distanceTo(coordinates);
+			Coordinates anotherCoordinates = gson.fromJson(anotherNode.spec().labels().get(NodeConstants.Label.COORDINATES), Coordinates.class);
+			double anotherDistance = anotherCoordinates.distanceTo(coordinates);
+			log.info("Comparing node {} at {} with distance {} to another node {} at {} with distance {}, to coordinates {}",
+				oneNode.status().addr(), oneCoordinates, oneDistance, anotherNode.status().addr(), anotherCoordinates, anotherDistance, coordinates);
 			return Double.compare(oneDistance, anotherDistance);
 		});
-		HostAddress hostAddress;
+		log.info("Nodes sorted by distance: {}", nodes.stream()
+			.map(node -> node.id() + ":" + node.status().addr() + ":" + node.spec().labels().get(NodeConstants.Label.COORDINATES))
+			.collect(Collectors.toList()));
+		EdgeHost closestEdgeHost = getClosestInactiveEdgeHost(coordinates);
+		Double closestEdgeHostDistance = closestEdgeHost == null ? null : closestEdgeHost.getCoordinates().distanceTo(coordinates);
+		CloudHost closestCloudHost = getClosestInactiveCloudHost(coordinates);
+		Double closestCloudHostDistance = closestCloudHost == null ? null : closestCloudHost.getAwsRegion().getCoordinates().distanceTo(coordinates);
+		AwsRegion closestAwsRegion = cloudHostsService.getClosestAwsRegion(coordinates);
+		double closestAwsRegionDistance = closestAwsRegion.getCoordinates().distanceTo(coordinates);
+		HostAddress hostAddress = null;
 		if (!nodes.isEmpty()) {
-			hostAddress = nodes.get(0).getHostAddress();
+			Node closestNode = nodes.get(0);
+			Coordinates closestCoordinates = gson.fromJson(closestNode.spec().labels().get(NodeConstants.Label.COORDINATES), Coordinates.class);
+			double distance = closestCoordinates.distanceTo(coordinates);
+			log.info("Closest aws region to {}: {}", coordinates, closestAwsRegion);
+			log.info("Closest inactive edge host distance to {}: {}", coordinates, closestEdgeHostDistance);
+			log.info("Closest inactive cloud host distance to {}: {}", coordinates, closestCloudHostDistance);
+			if ((closestEdgeHostDistance == null || distance <= closestEdgeHostDistance * HOST_DISTANCE_FACTOR)
+				&& (closestCloudHostDistance == null || distance <= closestCloudHostDistance * HOST_DISTANCE_FACTOR)
+				&& distance <= closestAwsRegionDistance * NEW_HOST_DISTANCE_FACTOR) {
+				String publicIp = closestNode.status().addr();
+				String privateIp = closestNode.spec().labels().get(NodeConstants.Label.PRIVATE_IP_ADDRESS);
+				hostAddress = new HostAddress(publicIp, privateIp, closestCoordinates);
+				log.info("Found closest node {} at host {} at distance of {}", closestNode.id(), hostAddress.toSimpleString(), distance);
+			}
 		}
-		else {
+		if (hostAddress == null && (closestEdgeHost != null || closestCloudHost != null)) {
+			if (closestEdgeHostDistance != null && closestCloudHostDistance != null
+				&& closestEdgeHostDistance <= closestCloudHostDistance
+				&& closestEdgeHostDistance <= closestAwsRegionDistance * NEW_HOST_DISTANCE_FACTOR) {
+				hostAddress = closestEdgeHost.getAddress();
+				log.info("Found close edge host {}", hostAddress.toSimpleString());
+			}
+			else if (closestCloudHost != null && closestCloudHostDistance <= closestAwsRegionDistance * NEW_HOST_DISTANCE_FACTOR) {
+				hostAddress = closestCloudHost.getAddress();
+				log.info("Found close cloud host {}", hostAddress.toSimpleString());
+			}
+		}
+		if (hostAddress == null) {
+			log.info("Found no close hosts, launching new instance instead");
 			hostAddress = cloudHostsService.launchInstance(coordinates).getAddress();
 		}
+
 		return hostAddress;
+	}
+
+	public EdgeHost getClosestInactiveEdgeHost(Coordinates coordinates) {
+		List<EdgeHost> edgeHosts = edgeHostsService.getInactiveEdgeHosts();
+		edgeHosts.sort((oneHost, anotherHost) -> {
+			double oneDistance = oneHost.getCoordinates().distanceTo(coordinates);
+			double anotherDistance = anotherHost.getCoordinates().distanceTo(coordinates);
+			return Double.compare(oneDistance, anotherDistance);
+		});
+		if (edgeHosts.size() > 0) {
+			return edgeHosts.get(0);
+		}
+		return null;
+	}
+
+	public CloudHost getClosestInactiveCloudHost(Coordinates coordinates) {
+		List<CloudHost> cloudHosts = cloudHostsService.getInactiveCloudHosts();
+		cloudHosts.sort((oneHost, anotherHost) -> {
+			double oneDistance = oneHost.getAwsRegion().getCoordinates().distanceTo(coordinates);
+			double anotherDistance = anotherHost.getAwsRegion().getCoordinates().distanceTo(coordinates);
+			return Double.compare(oneDistance, anotherDistance);
+		});
+		if (cloudHosts.size() > 0) {
+			return cloudHosts.get(0);
+		}
+		return null;
 	}
 
 	public HostAddress getClosestHost(Coordinates coordinates, List<EdgeHost> edgeHosts, List<CloudHost> cloudHosts) {
@@ -456,13 +532,8 @@ public class HostsService {
 				try {
 					return edgeHostsService.getEdgeHostByAddress(hostAddress).getAddress();
 				}
-				catch (EntityNotFoundException ignored3) {
-					try {
-						return edgeHostsService.getEdgeHostByHostname(hostAddress.getHostname()).getAddress();
-					}
-					catch (EntityNotFoundException e) {
-						throw new EntityNotFoundException("Host", "hostAddress", hostAddress.toString());
-					}
+				catch (EntityNotFoundException e) {
+					throw new EntityNotFoundException("Host", "hostAddress", hostAddress.toString());
 				}
 			}
 		}
@@ -486,6 +557,9 @@ public class HostsService {
 		HostAddress hostAddress;
 		try {
 			CloudHost cloudHost = cloudHostsService.getCloudHostByIdOrIp(host);
+			if (managerServicesConfiguration.getMode() == Mode.LOCAL) {
+				throw new BadRequestException("cloud instances are not supported when using local execution");
+			}
 			if (cloudHost.getState().getCode() != AwsInstanceState.RUNNING.getCode()) {
 				cloudHost = cloudHostsService.startInstance(host, false);
 			}

@@ -26,7 +26,6 @@ package pt.unl.fct.miei.usmanagement.manager.management.monitoring;
 
 import com.spotify.docker.client.messages.swarm.Node;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
@@ -36,6 +35,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.location.LocationRequestsService;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.HostsEventsService;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.HostMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.simulated.HostSimulatedMetricsService;
@@ -58,16 +58,8 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -92,6 +84,7 @@ public class HostsMonitoringService {
 	private final HostSimulatedMetricsService hostSimulatedMetricsService;
 	private final NodesService nodesService;
 	private final KafkaService kafkaService;
+	private final LocationRequestsService locationRequestsService;
 
 	private final long monitorPeriod;
 	private final int resolveOverworkedHostOnEventsCount;
@@ -107,8 +100,9 @@ public class HostsMonitoringService {
 								  HostsService hostsService, HostMetricsService hostMetricsService,
 								  ServicesService servicesService, HostsEventsService hostsEventsService,
 								  DecisionsService decisionsService, HostSimulatedMetricsService hostSimulatedMetricsService,
-								  NodesService nodesService, KafkaService kafkaService, HostProperties hostProperties,
-								  WorkerManagerProperties workerManagerProperties, MonitoringProperties monitoringProperties) {
+								  NodesService nodesService, KafkaService kafkaService, LocationRequestsService locationRequestsService,
+								  HostProperties hostProperties, WorkerManagerProperties workerManagerProperties,
+								  MonitoringProperties monitoringProperties) {
 		this.hostsMonitoring = hostsMonitoring;
 		this.hostMonitoringLogs = hostMonitoringLogs;
 		this.dockerSwarmService = dockerSwarmService;
@@ -122,6 +116,7 @@ public class HostsMonitoringService {
 		this.hostSimulatedMetricsService = hostSimulatedMetricsService;
 		this.nodesService = nodesService;
 		this.kafkaService = kafkaService;
+		this.locationRequestsService = locationRequestsService;
 		this.monitorPeriod = monitoringProperties.getHosts().getPeriod();
 		this.resolveOverworkedHostOnEventsCount = monitoringProperties.getHosts().getOverworkEventCount();
 		this.resolveUnderworkedHostOnEventsCount = monitoringProperties.getHosts().getUnderworkEventCount();
@@ -210,30 +205,16 @@ public class HostsMonitoringService {
 
 	private void monitorHostsTask() {
 		List<Node> nodes = dockerSwarmService.getReadyNodes();
-		List<CompletableFuture<HostDecisionResult>> futureHostDecisions = nodes.stream()
-			.map(this::getHostDecisions)
-			.collect(Collectors.toList());
 
-		CompletableFuture.allOf(futureHostDecisions.toArray(new CompletableFuture[0])).join();
-
-		List<HostDecisionResult> hostDecisions = new LinkedList<>();
-		List<HostAddress> successfulHostAddresses = new LinkedList<>();
-		for (CompletableFuture<HostDecisionResult> futureHostDecision : futureHostDecisions) {
-			try {
-				HostDecisionResult hostDecisionResult = futureHostDecision.get();
-				hostDecisions.add(hostDecisionResult);
-				successfulHostAddresses.add(hostDecisionResult.getHostAddress());
-			}
-			catch (InterruptedException | ExecutionException e) {
-				log.error("Failed to get decisions from all hosts: {}", e.getMessage());
-			}
+		List<HostDecisionResult> hostDecisions = new ArrayList<>(nodes.size());
+		CompletableFuture<?>[] requests = new CompletableFuture[nodes.size()];
+		int count = 0;
+		for (Node node : nodes) {
+			CompletableFuture<?> request = CompletableFuture.supplyAsync(() -> this.getHostDecisions(node))
+					.thenAccept(hostDecisions::add);
+			requests[count++] = request;
 		}
-
-		// filter out unsuccessful hosts
-		nodes = nodes.stream().filter(node -> {
-			HostAddress hostAddress = new HostAddress(node.status().addr(), node.spec().labels().get(NodeConstants.Label.PRIVATE_IP_ADDRESS));
-			return successfulHostAddresses.contains(hostAddress);
-		}).collect(Collectors.toList());
+		CompletableFuture.allOf(requests).join();
 
 		if (!hostDecisions.isEmpty()) {
 			processHostDecisions(hostDecisions, nodes);
@@ -243,30 +224,16 @@ public class HostsMonitoringService {
 		}
 	}
 
-	@Async
-	public CompletableFuture<HostDecisionResult> getHostDecisions(Node node) {
+	public HostDecisionResult getHostDecisions(Node node) {
 		HostAddress hostAddress = new HostAddress(node.status().addr(), node.spec().labels().get(NodeConstants.Label.PRIVATE_IP_ADDRESS));
 
 		// Metrics from prometheus (node_exporter)
-		Map<String, CompletableFuture<Optional<Double>>> futureStats = hostMetricsService.getHostStats(hostAddress);
+		Map<String, Optional<Double>> stats = hostMetricsService.getHostStats(hostAddress);
+		log.info("Got prometheus metrics from host: {}", stats);
 
-		CompletableFuture.allOf(futureStats.values().toArray(new CompletableFuture[0])).join();
-
-		Map<String, Optional<Double>> stats = futureStats.entrySet()
-			.stream()
-			.collect(Collectors.toMap(Map.Entry::getKey,
-				futureStat -> {
-					try {
-						return futureStat.getValue().get();
-					}
-					catch (InterruptedException | ExecutionException interruptedException) {
-						log.error("Unable to get value of field {} from host {}", futureStat.getKey(), hostAddress.toSimpleString());
-					}
-					return Optional.empty();
-				}));
 		Map<String, Double> validStats = stats.entrySet().stream()
-			.filter(stat -> stat.getValue().isPresent())
-			.collect(Collectors.toMap(Map.Entry::getKey, s -> s.getValue().get()));
+				.filter(stat -> stat.getValue().isPresent())
+				.collect(Collectors.toMap(Map.Entry::getKey, s -> s.getValue().get()));
 
 		// Simulated host metrics
 		Map<String, Double> hostSimulatedFields = hostSimulatedMetricsService.getHostSimulatedMetricByHost(hostAddress)
@@ -276,7 +243,9 @@ public class HostsMonitoringService {
 
 		validStats.forEach((stat, value) -> saveHostMonitoring(hostAddress, stat, value));
 
-		return CompletableFuture.completedFuture(runRules(node, validStats));
+		log.info("Metrics for host {} after removing invalid values and applying simulated metrics", stats);
+
+		return runRules(node, validStats);
 	}
 
 	private HostDecisionResult runRules(Node node, Map<String, Double> newFields) {

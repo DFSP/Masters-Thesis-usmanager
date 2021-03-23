@@ -47,11 +47,9 @@ import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.PlaceEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.bash.BashService;
 import pt.unl.fct.miei.usmanagement.manager.services.configurations.ConfigurationsService;
-import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.DockerCoreService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.services.remote.ssh.SshService;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -132,7 +130,7 @@ public class DockerSwarmService {
 		configurationsService.addConfiguration(nodeId);
 		try {
 			setNodeLabels(nodeId, listenAddress, username, hostAddress.getCoordinates(), hostAddress.getRegion(),
-				hostAddress.getPlace(), Collections.singletonMap(NodeConstants.Label.MASTER_MANAGER, String.valueOf(true)));
+				hostAddress.getPlace(), Collections.singletonMap(NodeConstants.Label.MANAGER_NODE, String.valueOf(true)));
 			createNetworkOverlay(hostAddress);
 			Node swarmNode = getNode(nodeId);
 			return nodesService.addNode(swarmNode);

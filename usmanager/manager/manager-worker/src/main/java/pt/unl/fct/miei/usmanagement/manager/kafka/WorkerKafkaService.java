@@ -325,7 +325,7 @@ public class WorkerKafkaService {
 		for (ContainerDTO containerDTO : containerDTOs) {
 			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, containerDTO);
-			if (key != null && key.getManagerId() != null && !key.getManagerId().equalsIgnoreCase("manager-master")) {
+			if (key != null && key.getManagerId() != null && !key.getManagerId().equalsIgnoreCase(ServiceConstants.Name.MASTER_MANAGER)) {
 				continue;
 			}
 			Container container = ContainerMapper.MAPPER.toContainer(containerDTO, context);

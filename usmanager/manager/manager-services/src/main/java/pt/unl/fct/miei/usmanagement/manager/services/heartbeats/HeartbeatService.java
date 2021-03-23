@@ -16,10 +16,12 @@ import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManage
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -57,16 +59,29 @@ public class HeartbeatService {
 		return heartbeats.save(heartbeat);
 	}
 
+	@Transactional
 	public Heartbeat saveWorkerHeartbeat(Heartbeat heartbeat) {
 		String managerId = heartbeat.getId();
 		log.info("Received heartbeat from worker {}", managerId);
 		WorkerManager workerManager = workerManagersService.getWorkerManager(managerId);
 		workerManager.setState("ready");
 		workerManagersService.saveWorkerManager(workerManager);
-		List<Container> containers = containersService.getContainers(managerId);
-		containers.forEach(container -> container.setState("ready"));
-		List<Node> nodes = nodesService.getNodes(node -> node.getManagerId().equalsIgnoreCase(managerId));
-		nodes.forEach(node -> node.setState("ready"));
+		List<Container> containers = containersService.getManagerContainers(managerId).stream()
+			.filter(container -> container.getState().equalsIgnoreCase("down"))
+			.collect(Collectors.toList());
+		if (containers.size() > 0) {
+			log.info("Setting worker manager containers to ready state");
+			containers.forEach(container -> container.setState("ready"));
+			containersService.saveContainers(containers);
+		}
+		List<Node> nodes = nodesService.getManagerNodes(managerId).stream()
+			.filter(node -> node.getState().equalsIgnoreCase("down"))
+			.collect(Collectors.toList());
+		if (nodes.size() > 0) {
+			log.info("Setting worker manager nodes to ready state");
+			nodes.forEach(node -> node.setState("ready"));
+			nodesService.saveNodes(nodes);
+		}
 		return heartbeats.save(heartbeat);
 	}
 

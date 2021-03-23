@@ -10,8 +10,10 @@ import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.Mode;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
+import pt.unl.fct.miei.usmanagement.manager.config.ManagerServicesConfiguration;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppDTO;
@@ -100,6 +102,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersServic
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.services.fields.FieldsService;
+import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.edge.EdgeHostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.simulated.AppSimulatedMetricsService;
@@ -119,11 +122,7 @@ import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 import pt.unl.fct.miei.usmanagement.manager.zookeeper.Zookeeper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -160,6 +159,9 @@ public class KafkaService {
 	private final ContainerRulesService containerRulesService;
 	private final ValueModesService valueModesService;
 	private final ZookeeperService zookeeperService;
+	private final HostsService hostsService;
+	private final ManagerServicesConfiguration managerServicesConfiguration;
+
 	private final ProducerFactory<KafkaTopicKey, Object> producerFactory;
 	private final KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 	private final KafkaBrokers kafkaBrokers;
@@ -193,6 +195,8 @@ public class KafkaService {
 						@Lazy ContainerRulesService containerRulesService,
 						@Lazy ValueModesService valueModesService,
 						@Lazy ZookeeperService zookeeperService,
+						@Lazy HostsService hostsService,
+						ManagerServicesConfiguration managerServicesConfiguration,
 						@Lazy ProducerFactory<KafkaTopicKey, Object> producerFactory,
 						KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry,
 						KafkaBrokers kafkaBrokers,
@@ -220,6 +224,8 @@ public class KafkaService {
 		this.elasticIpsService = elasticIpsService;
 		this.servicesService = servicesService;
 		this.zookeeperService = zookeeperService;
+		this.hostsService = hostsService;
+		this.managerServicesConfiguration = managerServicesConfiguration;
 		this.producerFactory = producerFactory;
 		this.kafkaBrokers = kafkaBrokers;
 		this.kafkaTemplate = kafkaTemplate;
@@ -240,24 +246,24 @@ public class KafkaService {
 
 		int previousKafkaBrokersCount = getKafkaBrokers().size();
 
-		List<CompletableFuture<KafkaBroker>> futureKafkaBrokers = regions.stream().map(region -> {
+		List<KafkaBroker> kafkaBrokers = new ArrayList<>();
+
+		List<CompletableFuture<?>> requests = new LinkedList<>();
+		for (RegionEnum region : regions) {
 			List<KafkaBroker> regionKafkaBrokers = getKafkaBroker(region);
 			if (regionKafkaBrokers.size() > 0) {
-				return CompletableFuture.completedFuture(regionKafkaBrokers.get(0));
+				log.info("kafka broker already running at {}", region);
+				kafkaBrokers.addAll(regionKafkaBrokers);
 			}
 			else {
-				HostAddress hostAddress = elasticIpsService.getHost(region);
-				return launchKafkaBroker(hostAddress);
+				HostAddress hostAddress = managerServicesConfiguration.getMode() == Mode.LOCAL
+						? hostsService.getManagerHostAddress()
+						: elasticIpsService.getHost(region);
+				requests.add(CompletableFuture.supplyAsync(() -> launchKafkaBroker(hostAddress)).thenAccept(kafkaBrokers::add));
 			}
-		}).collect(Collectors.toList());
-
-		CompletableFuture.allOf(futureKafkaBrokers.toArray(new CompletableFuture[0])).join();
-
-		List<KafkaBroker> kafkaBrokers = new ArrayList<>();
-		for (CompletableFuture<KafkaBroker> futureKafkaBroker : futureKafkaBrokers) {
-			KafkaBroker kafkaBroker = futureKafkaBroker.join();
-			kafkaBrokers.add(kafkaBroker);
 		}
+
+		CompletableFuture.allOf(requests.toArray(new CompletableFuture[0])).join();
 
 		if (previousKafkaBrokersCount == 0) {
 			startConsumers();
@@ -267,7 +273,7 @@ public class KafkaService {
 		return kafkaBrokers;
 	}
 
-	public CompletableFuture<KafkaBroker> launchKafkaBroker(HostAddress hostAddress) {
+	public KafkaBroker launchKafkaBroker(HostAddress hostAddress) {
 		RegionEnum region = hostAddress.getRegion();
 		List<Zookeeper> zookeepers = zookeeperService.getZookeepers(region);
 		if (zookeepers.size() == 0) {
@@ -293,7 +299,7 @@ public class KafkaService {
 			ContainerConstants.Label.KAFKA_BROKER_ID, String.valueOf(brokerId)
 		);
 		Container container = containersService.launchContainer(hostAddress, ServiceConstants.Name.KAFKA, environment, labels);
-		return CompletableFuture.completedFuture(saveKafkaBroker(container));
+		return saveKafkaBroker(container);
 	}
 
 	public List<KafkaBroker> getKafkaBrokers() {
@@ -301,12 +307,14 @@ public class KafkaService {
 	}
 
 	public String getKafkaBrokersHosts() {
-		return kafkaBootstrapServers != null
-			? kafkaBootstrapServers
-			: elasticIpsService.getElasticIps().stream()
-			.filter(elasticIp -> elasticIp.getAssociationId() != null)
-			.map(elasticIp -> String.format("%s:%d", elasticIp.getPublicIp(), PORT))
-			.collect(Collectors.joining(","));
+		if (kafkaBootstrapServers != null) {
+			return kafkaBootstrapServers;
+		}
+		if (managerServicesConfiguration.getMode() == Mode.LOCAL) {
+			return String.format("%s:%d", hostsService.getManagerHostAddress().getPrivateIpAddress(), PORT);
+		}
+		return elasticIpsService.getElasticIps().stream().filter(elasticIp -> elasticIp.getAssociationId() != null)
+			.map(elasticIp -> String.format("%s:%d", elasticIp.getPublicIp(), PORT)).collect(Collectors.joining(","));
 	}
 
 	private List<KafkaBroker> getKafkaBroker(RegionEnum region) {
@@ -656,7 +664,7 @@ public class KafkaService {
 
 	public void send(String topic, Object message, Object id) {
 		boolean hasKafkaBrokers = hasKafkaBrokers();
-		if (managerId != null && !managerId.equalsIgnoreCase("manager-master") || hasKafkaBrokers && populated) {
+		if (managerId != null && !managerId.equalsIgnoreCase(ServiceConstants.Name.MASTER_MANAGER) || hasKafkaBrokers && populated) {
 			log.info("Sending {} to topic={}", ToStringBuilder.reflectionToString(message), topic);
 			kafkaTemplate.send(topic, new KafkaTopicKey(managerId), message);
 		}
@@ -668,7 +676,7 @@ public class KafkaService {
 
 	public void delete(String topic, Object id) {
 		boolean hasKafkaBrokers = hasKafkaBrokers();
-		if (managerId != null && !managerId.equalsIgnoreCase("manager-master") || hasKafkaBrokers && populated) {
+		if (managerId != null && !managerId.equalsIgnoreCase(ServiceConstants.Name.MASTER_MANAGER) || hasKafkaBrokers && populated) {
 			log.info("Sending DELETE id={} request to topic={}", id, topic);
 			kafkaTemplate.send(topic, new KafkaTopicKey(managerId, "DELETE"), id);
 		}

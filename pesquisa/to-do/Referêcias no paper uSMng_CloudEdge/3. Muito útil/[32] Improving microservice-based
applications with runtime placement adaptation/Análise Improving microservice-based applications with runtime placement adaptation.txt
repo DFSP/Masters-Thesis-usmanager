@@ -1,9 +1,0 @@
-Improving microservice-based applications with runtime placement adaptation
-Link: TODO
-
-Resumo: 
-In this paper, we first identify the runtime aspects of microservice execution that impact the placement of microservices in a μApp. We then review the challenges of reconfiguring a μApp based on these aspects. Our main contribution is an adaptation mechanism, named REMaP, to manage the placement of microservices in an μApp automatically. To achieve this, REMaP uses microservice affinities and resource usage history. We evaluate our REMaP prototype and demonstrate that our solution is autonomic, lowers resource utilization, and can substantially improve μApp performance
-
-- However, existing tools for μApps, like Kubernetes, provide minimal ability to influence the placement and utilization of a μApp deployment.
-
-TODO: análise e leitura detalhada do paper

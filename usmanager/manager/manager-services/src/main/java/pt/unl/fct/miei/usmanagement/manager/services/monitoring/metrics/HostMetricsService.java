@@ -37,12 +37,8 @@ import pt.unl.fct.miei.usmanagement.manager.services.fields.FieldsService;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.prometheus.PrometheusService;
 import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.MonitoringProperties;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -67,57 +63,59 @@ public class HostMetricsService {
 	public boolean hostHasEnoughResources(HostAddress hostAddress, double expectedMemoryConsumption) {
 		Optional<Integer> port = containersService.getSingletonContainer(hostAddress, ServiceConstants.Name.PROMETHEUS)
 			.map(c -> c.getPorts().stream().findFirst().get().getPublicPort());
-		List<CompletableFuture<Optional<Double>>> futureMetrics = List.of(
-			PrometheusQueryEnum.TOTAL_MEMORY,
-			PrometheusQueryEnum.AVAILABLE_MEMORY,
-			PrometheusQueryEnum.CPU_USAGE_PERCENTAGE)
-			.stream().map(stat -> {
-				if (port.isPresent()) {
-					return prometheusService.getStat(hostAddress, port.get(), stat);
-				}
-				else {
-					Optional<Double> emptyOptional = Optional.empty();
-					return CompletableFuture.completedFuture(emptyOptional);
-				}
-			})
-			.collect(Collectors.toList());
-
-		CompletableFuture.allOf(futureMetrics.toArray(new CompletableFuture[0])).join();
-
-		List<Optional<Double>> metrics;
-		try {
-			metrics = new ArrayList<>();
-			for (CompletableFuture<Optional<Double>> futureMetric : futureMetrics) {
-				Optional<Double> metric = futureMetric.get();
-				metrics.add(metric);
-			}
-		}
-		catch (InterruptedException | ExecutionException e) {
-			log.error("Unable to get metrics from prometheus for host {}: {}", hostAddress.toSimpleString(), e.getMessage());
+		if (port.isEmpty()) {
+			log.info("Failed to find prometheus container on host {}", hostAddress);
 			return false;
 		}
 
-		Optional<Double> totalRam = metrics.get(0);
-		Optional<Double> availableRam = metrics.get(1);
-		Optional<Double> cpuUsage = metrics.get(2);
-		if (totalRam.isPresent() && availableRam.isPresent() && cpuUsage.isPresent()) {
+		List<PrometheusQueryEnum> prometheusQueries = List.of(
+			PrometheusQueryEnum.TOTAL_MEMORY,
+			PrometheusQueryEnum.AVAILABLE_MEMORY,
+			PrometheusQueryEnum.CPU_USAGE_PERCENTAGE,
+			PrometheusQueryEnum.CPU_CORES);
+
+		Map<PrometheusQueryEnum, Optional<Double>> metrics = new HashMap<>(prometheusQueries.size());
+
+		CompletableFuture<?>[] requests = new CompletableFuture[prometheusQueries.size()];
+		int count = 0;
+		for (PrometheusQueryEnum prometheusQuery : prometheusQueries) {
+			CompletableFuture<?> future = CompletableFuture
+				.supplyAsync(() -> prometheusService.getStat(hostAddress, port.get(), prometheusQuery))
+				.exceptionally(ex -> Optional.empty())
+				.thenAccept(metric -> metrics.put(prometheusQuery, metric));
+			requests[count++] = future;
+		}
+		CompletableFuture.allOf(requests).join();
+
+		Optional<Double> totalRam = metrics.get(PrometheusQueryEnum.TOTAL_MEMORY);
+		Optional<Double> availableRam = metrics.get(PrometheusQueryEnum.AVAILABLE_MEMORY);
+		Optional<Double> cpuUsage = metrics.get(PrometheusQueryEnum.CPU_USAGE_PERCENTAGE);
+		Optional<Double> cpuCores = metrics.get(PrometheusQueryEnum.CPU_CORES);
+		if (totalRam != null && totalRam.isPresent()
+			&& availableRam != null
+			&& availableRam.isPresent()
+			&& cpuUsage != null && cpuUsage.isPresent()
+			&& cpuCores != null && cpuCores.isPresent()) {
 			double totalRamValue = totalRam.get();
 			double availableRamValue = availableRam.get();
 			double predictedRamUsage = (1.0 - ((availableRamValue - expectedMemoryConsumption) / totalRamValue)) * 100.0;
 			boolean hasEnoughMemory = predictedRamUsage < maximumRamPercentage;
-			log.info("Node {} {} enough ram, predictedRamUsage={} {} maximumRamPercentage={}",
-				hostAddress, hasEnoughMemory ? "has" : "doesn't have", predictedRamUsage, hasEnoughMemory ? "<" : ">=", maximumRamPercentage);
-			double cpuUsageValue = cpuUsage.get();
+			log.info("Node {} {} enough ram, predictedRamUsage={} {} maximumRamPercentage={} (total ram={}, available ram={})",
+				hostAddress, hasEnoughMemory ? "has" : "doesn't have", predictedRamUsage, hasEnoughMemory ? "<" : ">=",
+				maximumRamPercentage, totalRamValue, availableRamValue);
+			double cpuCoresNumber = cpuCores.get();
+			double cpuUsageValue = cpuCoresNumber == 0 ? cpuUsage.get() : cpuUsage.get() / cpuCoresNumber;
 			boolean hasEnoughCpu = cpuUsageValue < maximumCpuPercentage;
 			log.info("Node {} {} enough cpu, cpuUsage={} {} maximumCpuPercentage={}",
-				hostAddress, hasEnoughCpu ? "has" : "doesn't have", cpuUsageValue, hasEnoughCpu ? "<" : ">=", maximumCpuPercentage);
+				hostAddress, hasEnoughCpu ? "has" : "doesn't have", cpuUsageValue, hasEnoughCpu ? "<" : ">=",
+				maximumCpuPercentage);
 			return hasEnoughMemory && hasEnoughCpu;
 		}
 		log.info("Node {} doesn't have enough capacity: failed to fetch metrics", hostAddress);
 		return false;
 	}
 
-	public Map<String, CompletableFuture<Optional<Double>>> getHostStats(HostAddress hostAddress) {
+	public Map<String, Optional<Double>> getHostStats(HostAddress hostAddress) {
 		Optional<Integer> port = containersService.getSingletonContainer(hostAddress, ServiceConstants.Name.PROMETHEUS)
 			.map(c -> c.getPorts().stream().findFirst().get().getPublicPort());
 		// Stats from prometheus (node exporter)
@@ -128,8 +126,7 @@ public class HostMetricsService {
 					return prometheusService.getStat(hostAddress, port.get(), field.getPrometheusQuery());
 				}
 				else {
-					Optional<Double> emptyOptional = Optional.empty();
-					return CompletableFuture.completedFuture(emptyOptional);
+					return Optional.empty();
 				}
 			}));
 	}

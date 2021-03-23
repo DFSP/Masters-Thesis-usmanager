@@ -36,6 +36,14 @@ type LocationRequest struct {
 	Service   string    `json:"service"`
 	Count     int       `json:"count"`
 	Timestamp time.Time `json:"timestamp,omitempty"`
+	Latitude float64 `json:"latitude,omitempty"`
+	Longitude float64 `json:"longitude,omitempty"`
+}
+
+type ServiceLocationRequest struct {
+	Count     int       `json:"count"`
+	Latitude float64 `json:"latitude,omitempty"`
+	Longitude float64 `json:"longitude,omitempty"`
 }
 
 func init() {

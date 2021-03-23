@@ -179,7 +179,7 @@ public class SyncService {
 		log.info("Synchronizing containers database with docker swarm");
 
 		List<Container> containers = containersService.getContainers();
-		List<DockerContainer> dockerContainers = dockerContainersService.getContainers();
+		List<DockerContainer> dockerContainers = dockerContainersService.getAllContainers();
 
 		// Add missing containers
 		List<String> containerIds = containers.stream().map(Container::getId).collect(Collectors.toList());
@@ -309,7 +309,7 @@ public class SyncService {
 				continue;
 			}
 			String managerId = node.getManagerId();
-			if ((managerId == null || managerId.equalsIgnoreCase("manager-master")) && !swarmNodesIds.containsKey(nodeId)) {
+			if ((managerId == null || managerId.equalsIgnoreCase(ServiceConstants.Name.MASTER_MANAGER)) && !swarmNodesIds.containsKey(nodeId)) {
 				nodesService.deleteNode(nodeId);
 				nodesIterator.remove();
 				log.info("Removed invalid node {}", nodeId);

@@ -93,9 +93,11 @@ func Register() error {
 			},
 		},
 	}
-	Instance.SetMetadataString("management.port", strconv.Itoa(Port))
 	Instance.SetMetadataString("latitude", strconv.FormatFloat(Latitude, 'f', -1, 64))
 	Instance.SetMetadataString("longitude", strconv.FormatFloat(Longitude, 'f', -1, 64))
+
+	reglog.Logger.Infof("Service data: service name %s, hostname %s, port %d, latitude %d, longitude %d, instance id %s",
+		Service, Hostname, Port, Latitude, Longitude, instanceId)
 
 	err := EurekaServer.ReregisterInstance(&Instance)
 	if err == nil {

@@ -1,2 +1,0 @@
-[2020-07-30 22:17:17,208] INFO The cleaning for partition USERS-0 is aborted and paused (kafka.log.LogCleaner)
-[2020-07-30 22:17:17,209] INFO The cleaning for partition USERS-0 is aborted (kafka.log.LogCleaner)

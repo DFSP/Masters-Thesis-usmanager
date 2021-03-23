@@ -26,6 +26,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.monitoring;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.core.env.Environment;
 import org.springframework.data.util.Pair;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.config.ManagerMasterProperties;
@@ -45,6 +46,8 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerContainer;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.location.LocationRequestsService;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.ContainerEvent;
@@ -97,6 +100,8 @@ public class ServicesMonitoringService {
 	private final AppSimulatedMetricsService appSimulatedMetricsService;
 	private final ServiceSimulatedMetricsService serviceSimulatedMetricsService;
 	private final ContainerSimulatedMetricsService containerSimulatedMetricsService;
+	private final DockerContainersService dockerContainersService;
+	private final Environment environment;
 
 	private final long monitorPeriod;
 	private final int stopContainerOnEventCount;
@@ -115,7 +120,8 @@ public class ServicesMonitoringService {
 									 AppSimulatedMetricsService appSimulatedMetricsService,
 									 ServiceSimulatedMetricsService serviceSimulatedMetricsService,
 									 ContainerSimulatedMetricsService containerSimulatedMetricsService,
-									 ManagerMasterProperties masterManagerProperties, MonitoringProperties monitoringProperties) {
+									 DockerContainersService dockerContainersService, Environment environment, ManagerMasterProperties masterManagerProperties,
+									 MonitoringProperties monitoringProperties) {
 		this.serviceMonitoringLogs = serviceMonitoringLogs;
 		this.servicesMonitoring = servicesMonitoring;
 		this.containersService = containersService;
@@ -129,6 +135,8 @@ public class ServicesMonitoringService {
 		this.appSimulatedMetricsService = appSimulatedMetricsService;
 		this.serviceSimulatedMetricsService = serviceSimulatedMetricsService;
 		this.containerSimulatedMetricsService = containerSimulatedMetricsService;
+		this.dockerContainersService = dockerContainersService;
+		this.environment = environment;
 		this.monitorPeriod = monitoringProperties.getServices().getPeriod();
 		this.stopContainerOnEventCount = monitoringProperties.getServices().getStopEventCount();
 		this.replicateContainerOnEventCount = monitoringProperties.getServices().getReplicateEventCount();
@@ -245,7 +253,7 @@ public class ServicesMonitoringService {
 	}
 
 	private void monitorServicesTask(int interval) {
-		List<Container> monitoringContainers = containersService.getAppContainers();
+		List<DockerContainer> monitoringContainers = dockerContainersService.getAppContainers();
 
 		Map<String, List<ServiceDecisionResult>> containersDecisions = new HashMap<>();
 
@@ -253,7 +261,7 @@ public class ServicesMonitoringService {
 
 			HostAddress hostAddress = container.getHostAddress();
 			String containerId = container.getId();
-			String serviceName = container.getServiceName();
+			String serviceName = container.getLabels().get(ContainerConstants.Label.SERVICE_NAME);
 
 			// Metrics from docker
 			Map<String, Double> stats = serviceMetricsService.getContainerStats(hostAddress, containerId);
@@ -382,7 +390,6 @@ public class ServicesMonitoringService {
 	}
 
 	private void executeDecisions(Map<String, List<ServiceDecisionResult>> decisions, Map<String, Integer> replicasCount) {
-		Map<String, Coordinates> serviceWeightedMiddlePoint = requestLocationMonitoringService.getServicesWeightedMiddlePoint();
 		for (Entry<String, List<ServiceDecisionResult>> servicesDecisions : decisions.entrySet()) {
 			String serviceName = servicesDecisions.getKey();
 			List<ServiceDecisionResult> containerDecisions = servicesDecisions.getValue();
@@ -394,9 +401,11 @@ public class ServicesMonitoringService {
 			if (currentReplicas < minimumReplicas) {
 				// start a new container to meet the requirements. The location is based on the data collected from the
 				// location-request-monitor component
+				Map<String, Coordinates> serviceWeightedMiddlePoint = requestLocationMonitoringService.getServicesWeightedMiddlePoint();
 				Coordinates coordinates = serviceWeightedMiddlePoint.get(serviceName);
 				if (coordinates == null) {
-					coordinates = topPriorityDecisionResult.getHostAddress().getCoordinates();
+					String containerId = topPriorityDecisionResult.getContainerId();
+					coordinates = containersService.getContainer(containerId).getHostAddress().getCoordinates();
 				}
 				double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(serviceName);
 				HostAddress hostAddress = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);
@@ -407,18 +416,36 @@ public class ServicesMonitoringService {
 			else {
 				RuleDecisionEnum topPriorityDecision = topPriorityDecisionResult.getDecision();
 				if (topPriorityDecision == RuleDecisionEnum.MIGRATE) {
-
+					String containerId = topPriorityDecisionResult.getContainerId();
+					String decision = topPriorityDecisionResult.getDecision().name();
+					long ruleId = topPriorityDecisionResult.getRuleId();
+					Map<String, Double> fields = topPriorityDecisionResult.getFields();
+					Map<String, Coordinates> serviceWeightedMiddlePoint = requestLocationMonitoringService.getServicesWeightedMiddlePoint();
+					Coordinates coordinates = serviceWeightedMiddlePoint.get(serviceName);
+					if (coordinates == null) {
+						coordinates = containersService.getContainer(containerId).getHostAddress().getCoordinates();
+					}
+					log.info("Migrating container {} close to coordinates {}", containerId, coordinates);
+					double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(serviceName);
+					HostAddress toHostAddress = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);
+					String migratedContainerId = containersService.migrateContainer(containerId, toHostAddress).getId();
+					String result = String.format("Migrated container %s to container %s on %s", containerId,
+						migratedContainerId, toHostAddress);
+					saveServiceDecision(containerId, serviceName, decision, ruleId, fields, result);
+					servicesEventsService.reset(containerId);
 				}
-				if (topPriorityDecision == RuleDecisionEnum.REPLICATE) {
+				else if (topPriorityDecision == RuleDecisionEnum.REPLICATE) {
 					if (maximumReplicas == 0 || currentReplicas < maximumReplicas) {
 						String containerId = topPriorityDecisionResult.getContainerId();
 						String decision = topPriorityDecisionResult.getDecision().name();
 						long ruleId = topPriorityDecisionResult.getRuleId();
 						Map<String, Double> fields = topPriorityDecisionResult.getFields();
+						Map<String, Coordinates> serviceWeightedMiddlePoint = requestLocationMonitoringService.getServicesWeightedMiddlePoint();
 						Coordinates coordinates = serviceWeightedMiddlePoint.get(serviceName);
 						if (coordinates == null) {
-							coordinates = topPriorityDecisionResult.getHostAddress().getCoordinates();
+							coordinates = containersService.getContainer(containerId).getHostAddress().getCoordinates();
 						}
+						log.info("Replicating container {} close to coordinates {}", containerId, coordinates);
 						double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(serviceName);
 						HostAddress toHostAddress = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);
 						String replicatedContainerId = containersService.replicateContainer(containerId, toHostAddress).getId();
@@ -428,13 +455,15 @@ public class ServicesMonitoringService {
 					}
 				}
 				else if (topPriorityDecision == RuleDecisionEnum.STOP) {
+					ServiceDecisionResult leastPriorityContainer = containerDecisions.get(containerDecisions.size() - 1);
+					// TODO choose a better container to stop. maybe based on lifetime and/or workload
+					String containerId = leastPriorityContainer.getContainerId();
+					String decision = leastPriorityContainer.getDecision().name();
+					long ruleId = leastPriorityContainer.getRuleId();
+					HostAddress hostAddress = leastPriorityContainer.getHostAddress();
+					Map<String, Double> fields = leastPriorityContainer.getFields();
+					String result;
 					if (currentReplicas > minimumReplicas) {
-						ServiceDecisionResult leastPriorityContainer = containerDecisions.get(containerDecisions.size() - 1);
-						String containerId = leastPriorityContainer.getContainerId();
-						String decision = leastPriorityContainer.getDecision().name();
-						long ruleId = leastPriorityContainer.getRuleId();
-						HostAddress hostAddress = leastPriorityContainer.getHostAddress();
-						Map<String, Double> fields = leastPriorityContainer.getFields();
 						containersService.stopContainer(containerId);
 						if (currentReplicas == 1) {
 							for (Service databaseService : servicesService.getDependenciesByType(serviceName, ServiceTypeEnum.DATABASE)) {
@@ -454,11 +483,14 @@ public class ServicesMonitoringService {
 									.forEach(mem -> containersService.stopContainer(mem.getId()));
 							}
 						}
-						String result = String.format("Stopped container %s of service %s on host %s", containerId, serviceName, hostAddress);
-						saveServiceDecision(containerId, serviceName, decision, ruleId, fields, result);
-						servicesEventsService.reset(containerId);
-
+						result = String.format("Stopped container %s of service %s on host %s", containerId, serviceName, hostAddress);
 					}
+					else {
+						result = String.format("Executed stop decision, but minimum replicas is %d and current replicas %d", minimumReplicas, currentReplicas);
+					}
+					log.info(result);
+					saveServiceDecision(containerId, serviceName, decision, ruleId, fields, result);
+					servicesEventsService.reset(containerId);
 				}
 			}
 		}

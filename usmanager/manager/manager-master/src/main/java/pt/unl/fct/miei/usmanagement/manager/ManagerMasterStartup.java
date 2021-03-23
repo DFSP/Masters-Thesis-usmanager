@@ -36,11 +36,11 @@ import org.springframework.stereotype.Component;
 import pt.unl.fct.miei.usmanagement.manager.config.ManagerServicesConfiguration;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.services.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
-import pt.unl.fct.miei.usmanagement.manager.services.regions.RegionsService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
@@ -85,24 +85,24 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 		HostAddress hostAddress = hostAddressJson == null
 				? hostsService.setManagerHostAddress()
 				: hostsService.setManagerHostAddress(new Gson().fromJson(hostAddressJson, HostAddress.class));
-		if (managerServicesConfiguration.getMode() != Mode.LOCAL) {
+		Mode mode = managerServicesConfiguration.getMode();
+		if (mode != Mode.LOCAL) {
 			elasticIpsService.allocateElasticIpAddresses();
 		}
 		hostsService.setupHost(hostAddress, NodeRole.MANAGER);
 		hostsService.clusterHosts();
-		servicesMonitoringService.initServiceMonitorTimer();
-		hostsMonitoringService.initHostMonitorTimer();
-		if (managerServicesConfiguration.getMode() != Mode.LOCAL) {
+		if (mode != Mode.LOCAL) {
 			syncService.startCloudHostsDatabaseSynchronization();
 		}
 		syncService.startContainersDatabaseSynchronization();
 		syncService.startNodesDatabaseSynchronization();
+		servicesMonitoringService.initServiceMonitorTimer();
+		hostsMonitoringService.initHostMonitorTimer();
 	}
 
 	private void requireEnvVars() {
 		Map<String, String> vars = new HashMap<>(1);
-		vars.put(ContainerConstants.Environment.Manager.ID,
-			environment.getProperty(ContainerConstants.Environment.Manager.ID));
+		vars.put(ContainerConstants.Environment.Manager.ID, environment.getProperty(ContainerConstants.Environment.Manager.ID));
 		log.info("Environment: {}", vars);
 		Set<String> requiredVars = vars.entrySet().stream().filter(e -> e.getValue() == null).map(Map.Entry::getKey).collect(Collectors.toSet());
 		if (!requiredVars.isEmpty()) {

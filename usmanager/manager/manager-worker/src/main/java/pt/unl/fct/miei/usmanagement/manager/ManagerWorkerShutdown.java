@@ -68,6 +68,7 @@ public class ManagerWorkerShutdown implements ApplicationListener<ContextClosedE
 	public void onApplicationEvent(@NonNull ContextClosedEvent event) {
 		hostsMonitoringService.stopHostMonitoring();
 		servicesMonitoringService.stopServiceMonitoring();
+		syncService.stopCloudHostsDatabaseSynchronization();
 		syncService.stopContainersDatabaseSynchronization();
 		syncService.stopNodesDatabaseSynchronization();
 		kafkaService.stop();

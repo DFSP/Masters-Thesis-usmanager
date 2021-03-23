@@ -1,4 +1,0 @@
-[2020-07-30 09:56:00,317] INFO [GroupMetadataManager brokerId=0] Removed 0 expired offsets in 0 milliseconds. (kafka.coordinator.group.GroupMetadataManager)
-[2020-07-30 09:59:06,997] INFO [GroupCoordinator 0]: Member[group.instance.id None, member.id consumer-console-consumer-82827-1-ada8a85e-69ec-4934-8f2b-fd44778fb567] in group console-consumer-82827 has left, removing it from the group (kafka.coordinator.group.GroupCoordinator)
-[2020-07-30 09:59:06,997] INFO [GroupCoordinator 0]: Preparing to rebalance group console-consumer-82827 in state PreparingRebalance with old generation 1 (__consumer_offsets-48) (reason: removing member consumer-console-consumer-82827-1-ada8a85e-69ec-4934-8f2b-fd44778fb567 on LeaveGroup) (kafka.coordinator.group.GroupCoordinator)
-[2020-07-30 09:59:06,997] INFO [GroupCoordinator 0]: Group console-consumer-82827 with generation 2 is now empty (__consumer_offsets-48) (kafka.coordinator.group.GroupCoordinator)

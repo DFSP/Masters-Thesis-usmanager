@@ -32,7 +32,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+<<<<<<< HEAD:usmanager/manager/manager-master/src/main/java/pt/unl/fct/miei/usmanagement/manager/management/docker/nodes/NodesController.java
 import pt.unl.fct.miei.usmanagement.manager.Mode;
+=======
+>>>>>>> 02b9fb7e15ad1655a7a18f29507ba6f0ca23dee7:manager-master/src/main/java/pt/unl/fct/miei/usmanagement/manager/management/docker/nodes/NodesController.java
 import pt.unl.fct.miei.usmanagement.manager.config.ManagerServicesConfiguration;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
@@ -86,7 +89,15 @@ public class NodesController {
 			return nodesService.addNodes(role, hostname, coordinates);
 		}
 		else {
+<<<<<<< HEAD:usmanager/manager/manager-master/src/main/java/pt/unl/fct/miei/usmanagement/manager/management/docker/nodes/NodesController.java
 			return workerManagersService.addNodes(addNode);
+=======
+			try {
+				return nodesService.addNodes(role, hostname, coordinates);
+			} catch (javax.ws.rs.BadRequestException e) {
+				throw new BadRequestException(e.getMessage());
+			}
+>>>>>>> 02b9fb7e15ad1655a7a18f29507ba6f0ca23dee7:manager-master/src/main/java/pt/unl/fct/miei/usmanagement/manager/management/docker/nodes/NodesController.java
 		}
 	}
 

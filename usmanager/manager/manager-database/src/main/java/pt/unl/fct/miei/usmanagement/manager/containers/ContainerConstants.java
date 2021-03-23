@@ -30,13 +30,20 @@ public final class ContainerConstants {
 	}
 
 	public static final class Environment {
-		public static final String SERVICE_REGION = "SERVICE_REGION";
-		public static final String BASIC_AUTH_USERNAME = "BASIC_AUTH_USERNAME";
-		public static final String BASIC_AUTH_PASSWORD = "BASIC_AUTH_PASSWORD";
-		public static final String PROXY_PASS = "PROXY_PASS";
+		//public static final String SERVICE_REGION = "SERVICE_REGION";
+		public static final String LATITUDE = "LATITUDE";
+		public static final String LONGITUDE = "LONGITUDE";
+
+		public static final class Proxy {
+			public static final String PROXY_PASS = "PROXY_PASS";
+			public static final String BASIC_AUTH_USERNAME = "BASIC_AUTH_USERNAME";
+			public static final String BASIC_AUTH_PASSWORD = "BASIC_AUTH_PASSWORD";
+		}
 
 		public static final class LoadBalancer {
 			public static final String SERVER = "SERVER";
+			public static final String BASIC_AUTH_USERNAME = "BASIC_AUTH_USERNAME";
+			public static final String BASIC_AUTH_PASSWORD = "BASIC_AUTH_PASSWORD";
 		}
 
 		public static final class Manager {
