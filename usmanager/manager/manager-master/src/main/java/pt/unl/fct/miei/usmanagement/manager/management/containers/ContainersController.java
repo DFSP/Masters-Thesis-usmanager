@@ -24,6 +24,10 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.containers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,14 +42,10 @@ import pt.unl.fct.miei.usmanagement.manager.Mode;
 import pt.unl.fct.miei.usmanagement.manager.config.ManagerServicesConfiguration;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
-<<<<<<< HEAD:usmanager/manager/manager-master/src/main/java/pt/unl/fct/miei/usmanagement/manager/management/containers/ContainersController.java
-=======
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
->>>>>>> 02b9fb7e15ad1655a7a18f29507ba6f0ca23dee7:manager-master/src/main/java/pt/unl/fct/miei/usmanagement/manager/management/containers/ContainersController.java
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
@@ -55,11 +55,6 @@ import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-
 @Slf4j
 @RestController
 @RequestMapping("/containers")
@@ -68,27 +63,19 @@ public class ContainersController {
 	private final ContainersService containersService;
 	private final WorkerManagersService workerManagersService;
 	private final SyncService syncService;
-<<<<<<< HEAD:usmanager/manager/manager-master/src/main/java/pt/unl/fct/miei/usmanagement/manager/management/containers/ContainersController.java
 	private final HostsService hostsService;
 	private final ManagerServicesConfiguration managerServicesConfiguration;
+	private final NodesService nodesService;
 
 	public ContainersController(ContainersService containersService, WorkerManagersService workerManagersService,
-								SyncService syncService, HostsService hostsService, ManagerServicesConfiguration managerServicesConfiguration) {
+								SyncService syncService, HostsService hostsService,
+								ManagerServicesConfiguration managerServicesConfiguration, NodesService nodesService) {
 		this.containersService = containersService;
 		this.workerManagersService = workerManagersService;
 		this.syncService = syncService;
 		this.hostsService = hostsService;
 		this.managerServicesConfiguration = managerServicesConfiguration;
-=======
-	private final NodesService nodesService;
-
-	public ContainersController(ContainersService containersService, WorkerManagersService workerManagersService,
-								SyncService syncService, NodesService nodesService) {
-		this.containersService = containersService;
-		this.workerManagersService = workerManagersService;
-		this.syncService = syncService;
 		this.nodesService = nodesService;
->>>>>>> 02b9fb7e15ad1655a7a18f29507ba6f0ca23dee7:manager-master/src/main/java/pt/unl/fct/miei/usmanagement/manager/management/containers/ContainersController.java
 	}
 
 	@GetMapping
@@ -113,17 +100,13 @@ public class ContainersController {
 	@PostMapping
 	public List<Container> launchContainer(@RequestBody LaunchContainerRequest launchContainerRequest) {
 		HostAddress hostAddress = launchContainerRequest.getHostAddress();
-<<<<<<< HEAD:usmanager/manager/manager-master/src/main/java/pt/unl/fct/miei/usmanagement/manager/management/containers/ContainersController.java
-		if (managerServicesConfiguration.getMode() == Mode.LOCAL ||
-			(hostAddress != null && hostsService.getManagerHostAddress().equals(hostAddress))) {
-			String service = launchContainerRequest.getService();
-			int internalPort = launchContainerRequest.getInternalPort();
-			int externalPort = launchContainerRequest.getExternalPort();
-			return List.of(containersService.launchContainer(hostAddress, service, internalPort, externalPort));
-=======
 		String service = launchContainerRequest.getService();
 		int internalPort = launchContainerRequest.getInternalPort();
 		int externalPort = launchContainerRequest.getExternalPort();
+		if (managerServicesConfiguration.getMode() == Mode.LOCAL ||
+			(hostAddress != null && hostsService.getManagerHostAddress().equals(hostAddress))) {
+			return List.of(containersService.launchContainer(hostAddress, service, internalPort, externalPort));
+		}
 		if (hostAddress != null) {
 			List<Node> nodes = nodesService.getHostNodes(hostAddress);
 			if (nodes.size() > 0) {
@@ -133,7 +116,6 @@ public class ContainersController {
 				}
 			}
 			return workerManagersService.launchContainers(launchContainerRequest);
->>>>>>> 02b9fb7e15ad1655a7a18f29507ba6f0ca23dee7:manager-master/src/main/java/pt/unl/fct/miei/usmanagement/manager/management/containers/ContainersController.java
 		}
 		else {
 			boolean isWorkerManager = launchContainerRequest.isWorkerManager();
