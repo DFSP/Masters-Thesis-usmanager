@@ -24,7 +24,7 @@
 
 import React, {createRef} from "react";
 import ListItem from "../list/ListItem";
-import listItemStyles from "../../components/list/ListItem.module.css";
+import listItemStyles from "../list/ListItem.module.css";
 import styles from "./CheckboxList.module.css";
 import {camelCaseToSentenceCase} from "../../utils/text";
 import Empty from "../list/Empty";

@@ -115,9 +115,14 @@ public class AppsController {
 
 	@PostMapping("/{appName}/launch")
 	public Map<String, List<Container>> launch(@PathVariable String appName, @RequestBody Coordinates coordinates) {
+<<<<<<< HEAD:usmanager/manager/manager-master/src/main/java/pt/unl/fct/miei/usmanagement/manager/management/apps/AppsController.java
 		return managerServicesConfiguration.getMode() == Mode.LOCAL
 			? appsService.launch(appName, coordinates)
 			: workerManagersService.launchApp(appName, coordinates);
+=======
+		//return appsService.launch(appName, coordinates);
+		return workerManagersService.launchApp(appName, coordinates);
+>>>>>>> 02b9fb7e15ad1655a7a18f29507ba6f0ca23dee7:manager-master/src/main/java/pt/unl/fct/miei/usmanagement/manager/management/apps/AppsController.java
 	}
 
 	@GetMapping("/{appId}/rules")
