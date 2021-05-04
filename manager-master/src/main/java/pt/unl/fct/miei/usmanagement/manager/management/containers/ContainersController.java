@@ -103,19 +103,26 @@ public class ContainersController {
 		String service = launchContainerRequest.getService();
 		int internalPort = launchContainerRequest.getInternalPort();
 		int externalPort = launchContainerRequest.getExternalPort();
-		if (managerServicesConfiguration.getMode() == Mode.LOCAL ||
-			(hostAddress != null && hostsService.getManagerHostAddress().equals(hostAddress))) {
+		if (managerServicesConfiguration.getMode() == Mode.LOCAL) {
+			if (hostAddress == null) {
+				hostAddress = hostsService.getManagerHostAddress();
+			}
 			return List.of(containersService.launchContainer(hostAddress, service, internalPort, externalPort));
 		}
 		if (hostAddress != null) {
-			List<Node> nodes = nodesService.getHostNodes(hostAddress);
-			if (nodes.size() > 0) {
-				Node node = nodes.get(0);
-				if (node.getManagerId().equalsIgnoreCase(ServiceConstants.Name.MASTER_MANAGER)) {
-					return List.of(containersService.launchContainer(hostAddress, service, internalPort, externalPort));
-				}
+			if (hostsService.getManagerHostAddress().equals(hostAddress)) {
+			 	return List.of(containersService.launchContainer(hostAddress, service, internalPort, externalPort));
 			}
-			return workerManagersService.launchContainers(launchContainerRequest);
+			else {
+				List<Node> nodes = nodesService.getHostNodes(hostAddress);
+					if (nodes.size() > 0) {
+						Node node = nodes.get(0);
+						if (node.getManagerId().equalsIgnoreCase(ServiceConstants.Name.MASTER_MANAGER)) {
+							return List.of(containersService.launchContainer(hostAddress, service, internalPort, externalPort));
+						}
+					}
+				return workerManagersService.launchContainers(launchContainerRequest);
+			}
 		}
 		else {
 			boolean isWorkerManager = launchContainerRequest.isWorkerManager();
