@@ -155,7 +155,7 @@ with Programmatic access access type, and AdministratorAccess policy. Replace th
 
 - [Configure keys](https://aws.amazon.com/en/premiumsupport/knowledge-center/ec2-ssh-key-pair-regions/) in all available regions.
 
-### Bugs
+### Known Bugs
 - When there are many users accessing the managers: https://stackoverflow.com/questions/32968530/hikaricp-connection-is-not-available
 - Error when deleting simulated rules and metrics, and their entities: see associations in database tables.
 
