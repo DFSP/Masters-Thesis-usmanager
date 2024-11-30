@@ -2,10 +2,8 @@
 
 Microservices management on Cloud and Edge
 
-μsManager is a system for managing microservices dynamically, whether in the cloud or at the edge.
-It replicates and migrates microservices according to the service load,
-through the collection of various metrics, such as device cpu and ram usage, location of requests,
-dependencies between microservices, and available cloud and edge devices.
+μsManager is a system for managing microservices dynamically, whether in the cloud or at the edge.  
+It replicates and migrates microservices according to the service load, through the collection of various metrics, such as device cpu and ram usage, location of requests, dependencies between microservices, and available cloud and edge devices.  
 This is a project to obtain a master's degree in Computer Engineering at [FCT-UNL](https://www.fct.unl.pt/).
 
 ### Project Structure
