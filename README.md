@@ -1,14 +1,14 @@
 # μsManager 
 
-Sistema de gestão dinâmico de microserviços
+Microservices management on Cloud and Edge
 
-μsManager é um sistema para fazer a gestão de microserviços dinamicamente, quer na cloud como na edge. 
-Tenta replicar e migrar microserviços conforme a carga dos serviços, 
-através da recolha de várias métricas, como utilização de cpu e ram dos dispositivos, localização dos pedidos, 
-dependências entre microserviços, e dispositivos cloud e edge disponíveis.  
-Este projeto está enquadrado no contexto de várias dissertações para obtenção do grau mestre em Engenharia Informática na [FCT-UNL](https://www.fct.unl.pt/).
+μsManager is a system for managing microservices dynamically, whether in the cloud or at the edge.
+It replicates and migrates microservices according to the service load,
+through the collection of various metrics, such as device cpu and ram usage, location of requests,
+dependencies between microservices, and available cloud and edge devices.
+This is a project to obtain a master's degree in Computer Engineering at [FCT-UNL](https://www.fct.unl.pt/).
 
-### Organização do projeto
+### Project Structure
 
 - [manager-database](manager-database)
 
@@ -107,13 +107,13 @@ Este projeto está enquadrado no contexto de várias dissertações para obtenç
     - [crash-testing](../microservices/test-suite/crash-testing)
     
 
-### Ferramentas usadas
+### Tools
 
 [<img src="https://i.imgur.com/c6X4nsq.png" alt="" width="48" height="48"> IntelliJ IDEA](https://www.jetbrains.com/idea/) - IntelliJ IDEA is an integrated development environment written in Java for developing computer software
 
 [<img src="https://i.imgur.com/LxlB6ty.png" alt="" width="48" height="48"> CLion](https://www.jetbrains.com/clion/) - A cross-platform IDE for C and C++
 
-As ferramentas específicas usadas em cada um dos módulos podem ser vistas nos respetivos ficheiros README.md:
+The specific tools used in each of the modules can be seen in the respective README.md files:
 
 > [Manager services](manager-services/README.md#ferramentas)  
 
@@ -131,36 +131,36 @@ As ferramentas específicas usadas em cada um dos módulos podem ser vistas nos 
 
 > [Nginx-load-balancer-api](registration-client/README.md#ferramentas)  
 
-### Configuração
+### Configuration
 
 ##### Aws
 
-O sistema usa instâncias aws ec2 para alojar os microserviços. Para configurar, seguir:
+The system uses AWS EC2 instances to host microservices. To configure, follow:
 
-- [Criar uma conta](https://signin.aws.amazon.com/signin?redirect_uri=https%3A%2F%2Fconsole.aws.amazon.com%2Fconsole%2Fhome%3Fstate%3DhashArgs%2523%26isauthcode%3Dtrue&client_id=arn%3Aaws%3Aiam%3A%3A015428540659%3Auser%2Fhomepage&forceMobileApp=0&code_challenge=Gzp7ZBgZKf6PFunBuy7d8chpcB2c9KDZzViYgdhBy1Q&code_challenge_method=SHA-256) no aws, caso ainda não tenha. A versão grátis deve ser suficiente
+- [Create an account](https://signin.aws.amazon.com/signin?redirect_uri=https%3A%2F%2Fconsole.aws.amazon.com%2Fconsole%2Fhome%3Fstate%3DhashArgs%2523%26isauthcode%3Dtrue&client_id=arn%3Aaws%3Aiam%3A%3A015428540659%3Auser%2Fhomepage&forceMobileApp=0&code_challenge=Gzp7ZBgZKf6PFunBuy7d8chpcB2c9KDZzViYgdhBy1Q&code_challenge_method=SHA-256) in AWS, if you don't already have it. The free version should be enough.
 
-- O dashboard pode ser consultado [aqui](https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#Home:).
+- The dashboard is available [here](https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#Home:).
 
-- [Criar](https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#SecurityGroups:) um Security Group, 
-com nome `us-manager-security-group`, e uma Inbound rule `Custom TCP 22-80 Anywhere`
+- [Create](https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#SecurityGroups:) a Security Group, 
+with name `us-manager-security-group`, e an Inbound rule `Custom TCP 22-80 Anywhere`
 
-- [Iniciar uma instância](https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#LaunchInstanceWizard:) 
-t2-micro, com base, por exemplo, no Ubuntu Server 20.04 LTS. Guardar o ficheiro .pem na pasta /manager-master/src/main/resources/aws.
-Executar `chmod 400 file.pem` no ficheiro .pem que foi transferido.
+- [Start an instance](https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#LaunchInstanceWizard:) 
+t2-micro, based on, for example, Ubuntu Server 20.04 LTS. Save the .pem file in the /manager-master/src/main/resources/aws folder.
+Run `chmod 400 file.pem` on the .pem file that was transferred.
 
-- Criar uma imagem (ami) a partir da instância iniciada anteriormente, no menu da instancia [aqui](https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#Instances:https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#Instances:),
-Image -> Create image. Após criada, adicionar a tag us-manager=true. 
-Substituir o id da ami no application.yaml, propriedade aws.instance.ami.
+- Create an image (ami) from the previously launched instance, in the instance menu [here](https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us- east-2#Instances:https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#Instances:),
+Image -> Create image. Once created, add the us-manager=true tag.
+Replace the ami id in application.yaml, aws.instance.ami property.
 
-- [Criar](https://console.aws.amazon.com/iam/home#/users) um utilizador *iam* para aceder aos recursos aws através, 
-com tipo de acesso Programmatic access, e política AdministratorAccess. Substituir os valores da access key e secret access key no application.yaml, propriedades aws.access.key e aws.access.secret-key, respetivamente.
+- [Create](https://console.aws.amazon.com/iam/home#/users) an *ia* user to access aws resources through,
+with Programmatic access access type, and AdministratorAccess policy. Replace the access key and secret access key values ​​in application.yaml, aws.access.key and aws.access.secret-key properties, respectively.
 
-- [Configurar chaves](https://aws.amazon.com/pt/premiumsupport/knowledge-center/ec2-ssh-key-pair-regions/) em todas as regiões disponíveis.
+- [Configure keys](https://aws.amazon.com/en/premiumsupport/knowledge-center/ec2-ssh-key-pair-regions/) in all available regions.
 
 ### Bugs
-- Quando existem demasiados utilizadores a aceder aos gestores: https://stackoverflow.com/questions/32968530/hikaricp-connection-is-not-available
-- Erro ao apagar regras e métricas simuladas, e as suas entidades: ver associações nas tabelas da base de dados.
+- When there are many users accessing the managers: https://stackoverflow.com/questions/32968530/hikaricp-connection-is-not-available
+- Error when deleting simulated rules and metrics, and their entities: see associations in database tables.
 
-### Licença
+### License
 
-μsManager está licenciado com a [MIT license](LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.
+μsManager is licensed under [MIT license](LICENSE). See the license in the header of the respective file to confirm.
