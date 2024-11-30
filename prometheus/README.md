@@ -1,40 +1,39 @@
-# Prometheus com Node exporter
+# Prometheus with node exporter
 
-Este módulo contém os ficheiros necessários para iniciar o componente [Prometheus](https://prometheus.io/), 
-configurado com o [node_exporter](https://prometheus.io/docs/guides/node-exporter/).
+This module contains the files needed to start the [Prometheus](https://prometheus.io/) component,
+configured with [node_exporter](https://prometheus.io/docs/guides/node-exporter/).
 
 ### Node_exporter
 
-O node exporter é um módulo do prometheus que permite obter métricas relativas ao host onde executa.
+The node exporter is a Prometheus module that allows you to obtain metrics related to the host where you run.
 
-##### Instalar
+##### Install
 
 ```shell script
 sh node-exporter-install.sh
 ```
 
-##### Iniciar
+##### Start
 
 ```shell script
 node_exporter
 ```
 
 ### Prometheus
- 
+
 ##### Docker
 
 ```shell script
-docker build -f docker/Dockerfile . -t prometheus  
+docker build -f docker/Dockerfile . -t prometheus
 docker run --rm -p 9090:9090 prometheus
 ```
 
-### Aceder às métricas
+### Accessing metrics
 
 http://localhost:9090/graph
 
-Pode experimentar, usando as queries que estão no enum [PrometheusQuery](../manager-database/src/main/java/pt/unl/fct/miei/usmanagement/manager/monitoring/PrometheusQuery.java).
+You can try, using the queries that are in the enum [PrometheusQuery](../manager-database/src/main/java/pt/unl/fct/miei/usmanagement/manager/monitoring/PrometheusQuery.java).
 
-## Licença
+## License
 
-Prometheus está licenciado com a [MIT license](../LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.
- 
+Prometheus is licensed under [MIT license](../LICENSE). See the license in the header of the respective file to confirm.
