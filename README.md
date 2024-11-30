@@ -148,7 +148,7 @@ with name `us-manager-security-group`, e an Inbound rule `Custom TCP 22-80 Anywh
 t2-micro, based on, for example, Ubuntu Server 20.04 LTS. Save the .pem file in the /manager-master/src/main/resources/aws folder.
 Run `chmod 400 file.pem` on the .pem file that was transferred.
 
-- Create an image (ami) from the previously launched instance, in the instance menu [here](https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us- east-2#Instances:https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#Instances:),
+- Create an image (ami) from the previously launched instance, in the instance menu [here](https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#Instances:https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#Instances:),
 Image -> Create image. Once created, add the us-manager=true tag.
 Replace the ami id in application.yaml, aws.instance.ami property.
 
