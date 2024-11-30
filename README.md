@@ -141,7 +141,7 @@ The system uses AWS EC2 instances to host microservices. To configure, follow:
 
 - The dashboard is available [here](https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#Home:).
 
-- [Create](https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#SecurityGroups:) a Security Group, 
+- [Create a Security Group](https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#SecurityGroups:), 
 with name `us-manager-security-group`, e an Inbound rule `Custom TCP 22-80 Anywhere`
 
 - [Start an instance](https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#LaunchInstanceWizard:) 
@@ -152,7 +152,7 @@ Run `chmod 400 file.pem` on the .pem file that was transferred.
 Image -> Create image. Once created, add the us-manager=true tag.
 Replace the ami id in application.yaml, aws.instance.ami property.
 
-- [Create](https://console.aws.amazon.com/iam/home#/users) an *ia* user to access aws resources through,
+- [Create an *ia* user](https://console.aws.amazon.com/iam/home#/users) to access aws resources through,
 with Programmatic access access type, and AdministratorAccess policy. Replace the access key and secret access key values ​​in application.yaml, aws.access.key and aws.access.secret-key properties, respectively.
 
 - [Configure keys](https://aws.amazon.com/en/premiumsupport/knowledge-center/ec2-ssh-key-pair-regions/) in all available regions.
