@@ -1,39 +1,39 @@
-# Registration Server
+# RegistrationServer
 
-Registration server é um modulo spring boot, gerido com maven, que inclui um [Servidor Eureka](https://github.com/Netflix/eureka) 
-para registar e descobrir microserviços.
+Registration server is a spring boot module, managed with maven, which includes a [Eureka Server](https://github.com/Netflix/eureka)
+to register and discover microservices.
 
-## Utilização
+## Usage
 
-<sup>Nota: 30b5f1e3d8cb54b548dae75d3a97e6a7f0657257 é o sha1 de `eureka-server_127.0.0.1_8761`</sup>
+<sup>Note: 30b5f1e3d8cb54b548dae75d3a97e6a7f0657257 is the sha1 of `eureka-server_127.0.0.1_8761`</sup>
 
-#### Com Maven
+#### With Maven
 
-Usando o plugin spring-boot  
+Using the spring-boot plugin
 ```
 mvn spring-boot:run -Dspring-boot.run.arguments="--port=8761 --host=127.0.0.1 --ip=127.0.0.1
 --id=30b5f1e3d8cb54b548dae75d3a97e6a7f0657257 --zone=http://127.0.0.1:8761/eureka"
 ```
 
-Usando o jar  
+Using jar
 ```
-mvn clean package -DskipTests
+clean mvn package -DskipTests
 java -Djava.security.egd=file:/dev/urandom -jar target/registration-server.jar \
 --port=8761 --host=127.0.0.1 --ip=127.0.0.1 --id=30b5f1e3d8cb54b548dae75d3a97e6a7f0657257 --zone=http://127.0.0.1:8761/eureka
 ```
 
-#### Com Docker
+#### With Docker
 
 ```
 docker build -f docker/Dockerfile . -t registration-server
 docker run --rm -p 8761:8761 registration-server
 ```
 
-## Guias
-[Spring Eureka Server](https://spring.io/guides/gs/service-registration-and-discovery) - This guide walks you through the process of starting and using the Netflix Eureka service registry.
+## Guides
+[Spring Eureka Server](https://spring.io/guides/gs/service-registration-and-discovery) - This guide walks you through the process of starting up and using the Netflix Eureka service registration.
 
-## Ferramentas
+## Tools
 
 ## License
 
-Registration-server está licenciado com a [MIT license](../LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.
+Registration-server is licensed under [MIT license](../LICENSE). See the license in the header of the respective file to confirm.
